@@ -1,0 +1,10 @@
+server:
+  port: 8443
+
+discord:
+  bot:
+    token: 12
+
+maple:
+  api:
+    key: -

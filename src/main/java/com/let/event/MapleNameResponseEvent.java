@@ -1,7 +1,9 @@
 package com.let.event;
 
+import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.springframework.stereotype.Component;
 
 /**
  * packageName    : com.let.event
@@ -14,6 +16,8 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
  * -----------------------------------------------------------
  * 25. 12. 10.        jun       최초 생성
  */
+@Component
+@RequiredArgsConstructor
 public class MapleNameResponseEvent extends ListenerAdapter {
 
     public void onMessageReceived(MessageReceivedEvent event) {

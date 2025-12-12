@@ -30,6 +30,9 @@ public class DiscordBotConfig {
 
     @Value("${discord.bot.token}")
     private String token;
+    // ✅ 스프링이 관리하는 이벤트 리스너 빈을 주입받는다
+    private final MapleNameResponseEvent mapleNameResponseEvent;
+    private final SlashComandEvent slashComandEvent;
 
     @Bean //
     public JDA jda() {
@@ -46,8 +49,8 @@ public class DiscordBotConfig {
         JDA jda = JDABuilder.createDefault(token,intents)
                     .setActivity(Activity.customStatus("!명령어로 명령어 확인 가능 :) "))
                 .addEventListeners(
-                        new MapleNameResponseEvent(),
-                        new SlashComandEvent())
+                        mapleNameResponseEvent,
+                        slashComandEvent)
                     .build();
         return jda;
     }

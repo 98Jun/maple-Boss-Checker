@@ -30,3 +30,21 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:/sql/schema.sql
+      data-locations: classpath:/sql/maplepoint.sql
+
+logging:
+  level:
+    com.let: DEBUG                  # 네 패키지
+    org.mybatis: DEBUG
+    org.apache.ibatis: DEBUG
+    org.springframework.jdbc.core: DEBUG
+
+mybatis:
+  mapper-locations: classpath*:mapper/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true

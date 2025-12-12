@@ -38,12 +38,14 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
-
     // 테스트
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     //JDA (Java DisCode API)
     implementation("net.dv8tion:JDA:6.1.3")
+
+    //h2 내부디비
+    runtimeOnly 'com.h2database:h2'
 }
 
 tasks.named('test') {

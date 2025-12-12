@@ -33,8 +33,8 @@ public class MapleNameResponseEvent extends ListenerAdapter {
 
         event.getChannel().sendMessage("""
                         제가가진 명령어는 
-                        1. 관세 계산기(고도화 예정 내부 db 사용하여 메이플포인트 시세 수집)
-                        2. 분배금 계산기 (개발예정)
+                        1. 관세 계산기
+                        2. 분배금 계산기 (균등분배 개발 완료, 자율 분배 개발 중 )
                         3. 보스 일정 알리미(개발예정)
                         입니다.
                         """).queue();

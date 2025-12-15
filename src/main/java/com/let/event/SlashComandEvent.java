@@ -103,7 +103,7 @@ public class SlashComandEvent extends ListenerAdapter {
         OptionData ratioOption = new OptionData(
                 OptionType.STRING,
                 "배율",
-                "(총비율 100) 자율 분배일 경우 각 인원의 기여도 ex) 50:30:20",
+                "( 총비율 100, x:y:z 형식, 아이템 판매자(1번) 수수료 제외 ) 자율 분배일 경우 각 인원의 기여도  ex) 50:30:20",
                 false // ✅ UI 상으로는 optional
         );
 
@@ -178,39 +178,139 @@ public class SlashComandEvent extends ListenerAdapter {
                         """.formatted(maplePoint,itemPay,myPayPoint, myPayMeso, myServerItemAmt)
                                 ).queue();
                 break;
+
             case "분배금계산기" :
                 String distributionOption = Objects.requireNonNull(event.getOption("분배구분")).getAsString();
+
+                int inputPay = Objects.requireNonNull(event.getOption("아이템금액")).getAsInt();
+                int peopleCount = Objects.requireNonNull(event.getOption("분배인원")).getAsInt();
+                int feePercent = Objects.requireNonNull(event.getOption("수수료")).getAsInt();
+
+                //수수료 ex) 0.95
+                double fee = (double) (100 - feePercent) / 100;
+
+                //아이템 금액 억단위 추가 (수수료 노 제외)
+                long itemAmt = (inputPay * 100000000L);
+
+                //수수료 제외 된 금액
+                double afterFeeAmt = inputPay * fee;
                 switch (distributionOption){
                     case "균등" :
 
-                        int inputPay = Objects.requireNonNull(event.getOption("아이템금액")).getAsInt();
-                        int pepleCount = Objects.requireNonNull(event.getOption("분배인원")).getAsInt();
-                        int feePercent = Objects.requireNonNull(event.getOption("수수료")).getAsInt();
-
-                        //수수료 ex) 0.95
-                        double fee = (double) (100 - feePercent) / 100;
-
-                        //수수료 제외 된 금액
-                        double afterFeeAmt = inputPay * fee;
-
-                        //아이템 금액 억단위 추가 (수수료 노 제외)
-                        long itemAmt = (inputPay * 100000000L);
 
                         //최종 인당 분배금액
                         // 아이템 금액/(1+(1/fee)*(파티원-1))
-                        BigDecimal resultAmt = BigDecimal.valueOf(itemAmt / (1+(1/fee) * (pepleCount-1) ));
+                        BigDecimal resultAmt = BigDecimal.valueOf(itemAmt / (1+(1/fee) * (peopleCount-1) ));
 
 
                         //입력금액(수수료 제외), 분배인원, 분배금(교환창에 올릴 금액)
                         event.reply("""
-                        입력 받은 분배 금액 : %.1f억
+                        %s 분배
+                        
+                        입력 받은 분배 금액(수수료 제외) : %.1f억
+                        
                         분배 인원 : %d명
+                        
                         분배금(교환창에 올릴 메소) : %,.0f메소
-                        """.formatted(afterFeeAmt,pepleCount, resultAmt)
+                        """.formatted(distributionOption,afterFeeAmt,peopleCount, resultAmt)
                         ).queue();
 
                         break;
                     case "자율" :
+
+                        var distributionPercentOption = event.getOption("배율");
+                        // 배율 유효성 검증 시작
+                        if(distributionPercentOption == null){
+                            event.reply("자율분배에 배율은 필수 값 입니다.")
+                                    .setEphemeral(true)
+                                    .queue();
+                            break;
+                        }
+
+                        String peoplePercentOption = Objects.requireNonNull(distributionPercentOption).getAsString().replaceAll(" ","");
+
+                        if(!peoplePercentOption.matches("^\\d+(?::\\d+)*$")){
+                            event.reply("배율 형식은 x:y:z 입니다. 숫자만 입력 해주세요.")
+                                    .setEphemeral(true)
+                                    .queue();
+                            break;
+                        }
+
+                        String[] parts = peoplePercentOption.split(":");
+                        int partsSum = 0;
+                        for(String part : parts){
+                            partsSum += Integer.parseInt(part);
+                        }
+
+                        if(partsSum != 100){
+                            event.reply("분배 비율의 총 합은 100이 되도록 입력 해주세요. 현재 합 : "+partsSum)
+                                    .setEphemeral(true)
+                                    .queue();
+                            break;
+                        }
+                        //배율 유효성 검증 끝
+
+                        //아이템 판매자(1번 수수료 제외)
+                        double firstPeople = (double) Integer.parseInt(parts[0]) / 100;
+                        // 아이템판매금액 /(아이템판매자 배율 + (1/수수료) * (1-아이템 판매지 비율 )) 이게 총 금액
+                        BigDecimal sumAmt = BigDecimal.valueOf(itemAmt / (firstPeople+(1/fee) * (1-firstPeople)));
+
+                        // [0] = 교환창에 올릴 메소(세전), [1] = 실 수령 메소(세후)
+                        List<BigDecimal[]> shareList = new ArrayList<>();
+                        // 아이템 판매자 금액을 제외하고 계산함.
+                        for(int i = parts.length-1;i>=1;i--){
+                            //현재 계산될 파티원의 배율
+                            BigDecimal peoplePercent = BigDecimal
+                                    .valueOf(Integer.parseInt(parts[i]))
+                                    .divide(BigDecimal.valueOf(100), 4, java.math.RoundingMode.HALF_UP);
+
+                            BigDecimal gross = sumAmt.multiply(peoplePercent);                        // 교환창에 올릴 금액
+                            BigDecimal net   = gross.multiply(BigDecimal.valueOf(fee));               // 실 수령 금액
+
+                            shareList.add(new BigDecimal[]{ gross, net });
+                        }
+
+
+                        BigDecimal firstGross = BigDecimal.valueOf(itemAmt * fee);
+                        for (BigDecimal[] s : shareList) {
+                            firstGross = firstGross.subtract(s[0]);
+                        }
+
+                        // 1번도 리스트에 추가 (앞에 넣고 싶으면 add(0, ...) 써도 됨)
+                        shareList.add(new BigDecimal[]{ firstGross, firstGross });
+
+                        StringBuilder sb = new StringBuilder();
+
+                        sb.append("""
+                        %s 분배
+                        
+                        입력 받은 분배 금액(수수료 제외) : %.1f억
+                        분배 인원 : %d명
+                        
+                        아이템 판매자 (수수료제외)
+                        """.formatted(distributionOption, afterFeeAmt, peopleCount));
+                        int num= 1;
+                        for (int i = shareList.size()-1; i >=0; i--) {
+
+                            BigDecimal gross = shareList.get(i)[0]; // 교환창 메소
+                            BigDecimal net   = shareList.get(i)[1]; // 실 수령 메소
+                            sb.append(String.format(
+                                    "%d번 분배금 : %,.0f메소%n",
+                                    num,
+                                    gross
+                            ));
+
+                            sb.append(String.format(
+                                    "%d번 실 수령금 : %,.0f메소%n%n" +
+                                            "",
+                                    num,
+                                    net
+                            ));
+
+                            num++;
+                        }
+
+                        event.reply(sb.toString()).queue();
 
                         break;
 

@@ -36,6 +36,7 @@ public class MapleNameResponseEvent extends ListenerAdapter {
                         1. 관세 계산기
                         2. 분배금 계산기
                         3. 보스 일정 알리미(개발예정)
+                        4. 간단한 캐릭터 정보조회 (개발예정 NEXON API 사용)
                         입니다.
                         """).queue();
         }

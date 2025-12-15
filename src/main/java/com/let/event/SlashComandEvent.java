@@ -179,38 +179,43 @@ public class SlashComandEvent extends ListenerAdapter {
                                 ).queue();
                 break;
             case "분배금계산기" :
-
                 String distributionOption = Objects.requireNonNull(event.getOption("분배구분")).getAsString();
+                switch (distributionOption){
+                    case "균등" :
 
-                int inputPay = Objects.requireNonNull(event.getOption("아이템금액")).getAsInt();
-                int pepleCount = Objects.requireNonNull(event.getOption("분배인원")).getAsInt();
-                int feePercent = Objects.requireNonNull(event.getOption("수수료")).getAsInt();
+                        int inputPay = Objects.requireNonNull(event.getOption("아이템금액")).getAsInt();
+                        int pepleCount = Objects.requireNonNull(event.getOption("분배인원")).getAsInt();
+                        int feePercent = Objects.requireNonNull(event.getOption("수수료")).getAsInt();
 
-                //수수료 ex) 0.95
-                double fee = (double) (100 - feePercent) / 100;
+                        //수수료 ex) 0.95
+                        double fee = (double) (100 - feePercent) / 100;
 
-                //수수료 제외 된 금액
-                double afterFeeAmt = inputPay * fee;
+                        //수수료 제외 된 금액
+                        double afterFeeAmt = inputPay * fee;
 
-                //아이템 금액 억단위 추가 (수수료 노 제외)
-                long itemAmt = (inputPay * 100000000L);
+                        //아이템 금액 억단위 추가 (수수료 노 제외)
+                        long itemAmt = (inputPay * 100000000L);
 
-                //최종 인당 분배금액
-                // 아이템 금액/(1+(1/fee)*(파티원-1))
-                BigDecimal resultAmt = BigDecimal.valueOf(itemAmt / (1+(1/fee) * (pepleCount-1) ));
+                        //최종 인당 분배금액
+                        // 아이템 금액/(1+(1/fee)*(파티원-1))
+                        BigDecimal resultAmt = BigDecimal.valueOf(itemAmt / (1+(1/fee) * (pepleCount-1) ));
 
-                //자율 아니면 그냥 균등으로 쪼개면 된다.
-                if(distributionOption.equals("자율")){
 
-                }
-                //자율이 아닐경우 출력되어야할 것
-                //입력금액(수수료 제외), 분배인원, 분배금(교환창에 올릴 금액)
-                event.reply("""
+                        //입력금액(수수료 제외), 분배인원, 분배금(교환창에 올릴 금액)
+                        event.reply("""
                         입력 받은 분배 금액 : %.1f억
                         분배 인원 : %d명
-                        분배금(교환창에 올릴 메소) : %.0f메소
+                        분배금(교환창에 올릴 메소) : %,.0f메소
                         """.formatted(afterFeeAmt,pepleCount, resultAmt)
-                ).queue();
+                        ).queue();
+
+                        break;
+                    case "자율" :
+
+                        break;
+
+                }
+
 
         }
 

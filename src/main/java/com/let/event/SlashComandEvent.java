@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -107,9 +108,9 @@ public class SlashComandEvent extends ListenerAdapter {
         );
 
         commandDatas.add(
-                    Commands.slash("분배금계산기", "분배금액(억 단위) ")
+                    Commands.slash("분배금계산기", "분배금액(억 ")
                             .addOptions(
-                                    new OptionData(OptionType.INTEGER, "아이템금액", "100", true),
+                                    new OptionData(OptionType.INTEGER, "아이템금액", "100 (억 단위)", true),
                                     chargeOption,
                                     pepleOption,
                                     distributionOption,
@@ -185,11 +186,19 @@ public class SlashComandEvent extends ListenerAdapter {
                 int pepleCount = Objects.requireNonNull(event.getOption("분배인원")).getAsInt();
                 int feePercent = Objects.requireNonNull(event.getOption("수수료")).getAsInt();
 
-                //수수료
-                int fee = inputPay * feePercent / 100;
-                int afterFee = inputPay - fee;
+                //수수료 ex) 0.95
+                double fee = (double) (100 - feePercent) / 100;
 
-                double resultAmt = afterFee / (double) pepleCount; // 47.5
+                //수수료 제외 된 금액
+                double afterFeeAmt = inputPay * fee;
+
+                //아이템 금액 억단위 추가 (수수료 노 제외)
+                long itemAmt = (inputPay * 100000000L);
+
+                //최종 인당 분배금액
+                // 아이템 금액/(1+(1/fee)*(파티원-1))
+                BigDecimal resultAmt = BigDecimal.valueOf(itemAmt / (1+(1/fee) * (pepleCount-1) ));
+
                 //자율 아니면 그냥 균등으로 쪼개면 된다.
                 if(distributionOption.equals("자율")){
 
@@ -197,10 +206,10 @@ public class SlashComandEvent extends ListenerAdapter {
                 //자율이 아닐경우 출력되어야할 것
                 //입력금액(수수료 제외), 분배인원, 분배금(교환창에 올릴 금액)
                 event.reply("""
-                        입력 받은 분배 금액(수수료 %d 제외) : %d억
+                        입력 받은 분배 금액 : %.1f억
                         분배 인원 : %d명
-                        분배금(교환창에 올릴 메소) : %.1f억
-                        """.formatted(feePercent,afterFee,pepleCount, resultAmt)
+                        분배금(교환창에 올릴 메소) : %.0f메소
+                        """.formatted(afterFeeAmt,pepleCount, resultAmt)
                 ).queue();
 
         }

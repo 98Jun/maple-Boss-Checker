@@ -2,7 +2,7 @@ package com.let.service.impl;
 
 import com.let.domain.MaplePointDutyCheckVO;
 import com.let.service.MapleDutyCheckService;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import com.let.service.impl.mapper.MapleDutyCheckMapper;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,10 +46,6 @@ public class MapleDutyCheckServiceImpl implements MapleDutyCheckService {
                 // 2) 입력 안 했으면 DB에서 가져오기
                 maplePoint = this.searchLastMaplePoint(server);
 
-//                if (maplePoint == null) {
-//                    // 3) DB에도 없으면 에러 응답
-//                    event.reply("수집된 메이플 포인트 시세가 없습니다. 메이플 포인트 시세를 입력 해 다시 시도 해주세요.").queue();
-//                }
             }
 
         return maplePoint;

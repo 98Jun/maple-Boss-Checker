@@ -1,4 +1,4 @@
-package com.let.service.impl;
+package com.let.service.impl.mapper;
 
 import com.let.domain.MaplePointDutyCheckVO;
 import org.apache.ibatis.annotations.Mapper;

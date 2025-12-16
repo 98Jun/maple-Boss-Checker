@@ -1,11 +1,14 @@
 package com.let.event;
 
+import com.let.domain.MapleParytScheduleVO;
 import com.let.domain.MaplePointDutyCheckVO;
 import com.let.service.MapleDistributionService;
 import com.let.service.MapleDutyCheckService;
+import com.let.service.MaplePartyScheduleService;
 import com.let.service.MapleUtilService;
-import com.let.service.impl.MapleDutyCheckMapper;
 import lombok.RequiredArgsConstructor;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.selections.EntitySelectMenu;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -17,9 +20,11 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.math.BigDecimal;
+import java.sql.Time;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -43,6 +48,8 @@ public class SlashComandEvent extends ListenerAdapter {
     private MapleUtilService mapleUtilService;
     @Autowired
     private MapleDistributionService mapleDistributionService;
+    @Autowired
+    private MaplePartyScheduleService maplePartyScheduleService;
 
     @Value("${maple.api.key}")
     private String mapleApiKey;
@@ -103,6 +110,13 @@ public class SlashComandEvent extends ListenerAdapter {
                                     ratioOption
                             )
 
+        );
+
+        //보스파티 일정등록
+        commandDatas.add(
+                Commands.slash("일정등록", "파티 일정을 등록합니다.")
+                        .addOption(OptionType.STRING, "날짜", "예: 2025.12.25 (yyyy.MM.dd)", true)
+                        .addOption(OptionType.STRING, "시간", "예: 07:00 (HH:mm)", true)
         );
 
         event.getGuild().updateCommands().addCommands(commandDatas).queue();
@@ -263,7 +277,55 @@ public class SlashComandEvent extends ListenerAdapter {
                         break;
 
                 }
+            case "일정등록" :
 
+                // 패턴은 문자열 형식이랑 정확히 맞춰야 함
+                String inputDate = Objects.requireNonNull(event.getOption("날짜")).getAsString();
+                String inputTime  = Objects.requireNonNull(event.getOption("시간")).getAsString();
+
+                //유효성 체크
+                boolean checkDateTime = this.mapleUtilService.checkDateTime(inputDate,inputTime);
+                if(!checkDateTime) {
+                    event.reply("날짜 및 시간 형식이 맞지 않습니다.")
+                            .setEphemeral(true)
+                            .queue();
+                    break;
+                }
+
+                //날짜 및 시간 파싱
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd");
+                Date bossDate;
+                try {
+                    bossDate = sdf.parse(inputDate);
+                } catch (ParseException e) {
+                    event.reply("보스 일정 날짜 파싱 중 오류가 발생했습니다.")
+                            .setEphemeral(true)
+                            .queue();
+                    throw new RuntimeException(e);
+                }
+                Time bossTime = Time.valueOf(inputTime+":00");
+
+                //일정 등록 -> 키값은 vo 안에 있음
+                MapleParytScheduleVO parytVO = this.maplePartyScheduleService.insertMapleParytSchedule(new MapleParytScheduleVO(bossDate,bossTime));
+
+                if(parytVO != null && parytVO.getId() >0){
+                    event.reply("일정을 저장 중 오류가 발생했습니다.. 잠시후 다시시도 해주세요.")
+                            .setEphemeral(true)
+                            .queue();
+                    break;
+                }
+                // 유저 선택 셀렉트박스 생성
+                EntitySelectMenu menu = EntitySelectMenu
+                        .create(String.valueOf(parytVO.getId()), EntitySelectMenu.SelectTarget.USER)
+                        .setPlaceholder("일정을 등록할 멤버를 선택하세요")
+                        .setRequiredRange(2, 6) // 최소 2명, 최대 6명 선택
+                        .build();
+                event.reply("일정을 등록할 멤버를 선택해 주세요.")
+                        .addComponents(ActionRow.of(menu))
+                        .setEphemeral(true) // 선택 UI는 본인만 보이게
+                        .queue();
+
+                break;
         }
 
     }

@@ -1,6 +1,7 @@
 package com.let.event;
 
 import com.let.domain.MaplePointDutyCheckVO;
+import com.let.service.MapleDistributionService;
 import com.let.service.MapleDutyCheckService;
 import com.let.service.MapleUtilService;
 import com.let.service.impl.MapleDutyCheckMapper;
@@ -12,6 +13,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -39,6 +41,8 @@ public class SlashComandEvent extends ListenerAdapter {
     private MapleDutyCheckService mapleDutyCheckService;
     @Autowired
     private MapleUtilService mapleUtilService;
+    @Autowired
+    private MapleDistributionService mapleDistributionService;
 
     @Value("${maple.api.key}")
     private String mapleApiKey;
@@ -127,10 +131,13 @@ public class SlashComandEvent extends ListenerAdapter {
                 // 메포시세를 입력했는지 체크
                 Integer maplePoint = null;
                 try {
+
                     maplePoint = this.mapleDutyCheckService.checkCommandMaplePoint(mapleOption,server);
 
                     if(maplePoint == null)  event.reply("수집된 메이플 포인트 시세가 없습니다. 메이플 포인트 시세를 입력 해 다시 시도 해주세요.").queue();
+
                 }catch (Exception e){
+
                     event.reply("""
                             메이플 포인트 시세 서버와의 연결에 문제가 있어 조회할 수 없습니다.
                             잠시 후 다시 시도해 주세요.
@@ -138,6 +145,7 @@ public class SlashComandEvent extends ListenerAdapter {
                             .setEphemeral(true)
                             .queue();
                     return;
+
                 }
 
                 //바꿔야할 메소(억단위)
@@ -161,6 +169,7 @@ public class SlashComandEvent extends ListenerAdapter {
                 break;
 
             case "분배금계산기" :
+
                 String distributionOption = Objects.requireNonNull(event.getOption("분배구분")).getAsString();
 
                 int inputPay = Objects.requireNonNull(event.getOption("아이템금액")).getAsInt();
@@ -175,6 +184,7 @@ public class SlashComandEvent extends ListenerAdapter {
 
                 //수수료 제외 된 금액
                 double afterFeeAmt = inputPay * fee;
+
                 switch (distributionOption){
                     case "균등" :
 
@@ -200,65 +210,20 @@ public class SlashComandEvent extends ListenerAdapter {
                     case "자율" :
 
                         var distributionPercentOption = event.getOption("배율");
-                        // 배율 유효성 검증 시작
-                        if(distributionPercentOption == null){
-                            event.reply("자율분배에 배율은 필수 값 입니다.")
+
+                        // 배율 유효성 검증
+                        JSONObject autonomousDistributionValidationObj =  this.mapleDistributionService.autonomousDistributionValidationCheck(distributionPercentOption);
+
+                        if(!autonomousDistributionValidationObj.getBoolean("isOk")){
+                            event.reply(autonomousDistributionValidationObj.getString("msg"))
                                     .setEphemeral(true)
                                     .queue();
-                            break;
                         }
+                        //사용자가 입력한 배율 50:30:20
+                        String[] parts = (String[]) autonomousDistributionValidationObj.get("parts");
 
-                        String peoplePercentOption = Objects.requireNonNull(distributionPercentOption).getAsString().replaceAll(" ","");
-
-                        if(!peoplePercentOption.matches("^\\d+(?::\\d+)*$")){
-                            event.reply("배율 형식은 x:y:z 입니다. 숫자만 입력 해주세요.")
-                                    .setEphemeral(true)
-                                    .queue();
-                            break;
-                        }
-
-                        String[] parts = peoplePercentOption.split(":");
-                        int partsSum = 0;
-                        for(String part : parts){
-                            partsSum += Integer.parseInt(part);
-                        }
-
-                        if(partsSum != 100){
-                            event.reply("분배 비율의 총 합은 100이 되도록 입력 해주세요. 현재 합 : "+partsSum)
-                                    .setEphemeral(true)
-                                    .queue();
-                            break;
-                        }
-                        //배율 유효성 검증 끝
-
-                        //아이템 판매자(1번 수수료 제외)
-                        double firstPeople = (double) Integer.parseInt(parts[0]) / 100;
-                        // 아이템판매금액 /(아이템판매자 배율 + (1/수수료) * (1-아이템 판매지 비율 )) 이게 총 금액
-                        BigDecimal sumAmt = BigDecimal.valueOf(itemAmt / (firstPeople+(1/fee) * (1-firstPeople)));
-
-                        // [0] = 교환창에 올릴 메소(세전), [1] = 실 수령 메소(세후)
-                        List<BigDecimal[]> shareList = new ArrayList<>();
-                        // 아이템 판매자 금액을 제외하고 계산함.
-                        for(int i = parts.length-1;i>=1;i--){
-                            //현재 계산될 파티원의 배율
-                            BigDecimal peoplePercent = BigDecimal
-                                    .valueOf(Integer.parseInt(parts[i]))
-                                    .divide(BigDecimal.valueOf(100), 4, java.math.RoundingMode.HALF_UP);
-
-                            BigDecimal gross = sumAmt.multiply(peoplePercent);                        // 교환창에 올릴 금액
-                            BigDecimal net   = gross.multiply(BigDecimal.valueOf(0.95));               // 실 수령 금액
-
-                            shareList.add(new BigDecimal[]{ gross, net });
-                        }
-
-
-                        BigDecimal firstGross = BigDecimal.valueOf(itemAmt * fee);
-                        for (BigDecimal[] s : shareList) {
-                            firstGross = firstGross.subtract(s[0]);
-                        }
-
-                        // 1번도 리스트에 추가 (앞에 넣고 싶으면 add(0, ...) 써도 됨)
-                        shareList.add(new BigDecimal[]{ firstGross, firstGross });
+                        //파티원 및 사용자 분배금리스트 [0] = 교환창에 올릴 메소(세전), [1] = 실 수령 메소(세후)
+                        List<BigDecimal[]> shareList = this.mapleDistributionService.getShareList(parts,itemAmt,fee);
 
                         StringBuilder sb = new StringBuilder();
 
@@ -270,6 +235,8 @@ public class SlashComandEvent extends ListenerAdapter {
                         
                         아이템 판매자 (수수료제외)
                         """.formatted(distributionOption, afterFeeAmt, peopleCount));
+
+                        //역순으로 진행하는 이유는 파티원 분배금을 지급 후 남은 금액을 아이템판매자(1번)이 가져가기 때문.
                         int num= 1;
                         for (int i = shareList.size()-1; i >=0; i--) {
 

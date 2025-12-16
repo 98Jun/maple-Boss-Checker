@@ -16,5 +16,7 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface MaplePartyScheduleMapper {
-    MapleParytScheduleVO insertMapleParytSchedule(MapleParytScheduleVO mapleParytScheduleVO);
+    int insertMapleParytSchedule(MapleParytScheduleVO mapleParytScheduleVO);
+
+    MapleParytScheduleVO selectPartySchedule(MapleParytScheduleVO mapleParytScheduleVO);
 }

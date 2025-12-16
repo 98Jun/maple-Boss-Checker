@@ -14,5 +14,7 @@ import com.let.domain.MapleParytScheduleVO;
  * 25. 12. 16.        jun       최초 생성
  */
 public interface MaplePartyScheduleService {
-    MapleParytScheduleVO insertMapleParytSchedule(MapleParytScheduleVO mapleParytScheduleVO);
+    int insertMapleParytSchedule(MapleParytScheduleVO mapleParytScheduleVO);
+
+    MapleParytScheduleVO selectPartySchedule(MapleParytScheduleVO mapleParytScheduleVO);
 }

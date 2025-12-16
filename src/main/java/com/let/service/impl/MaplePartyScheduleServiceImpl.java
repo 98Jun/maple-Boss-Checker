@@ -23,7 +23,12 @@ public class MaplePartyScheduleServiceImpl implements MaplePartyScheduleService 
     @Autowired
     private MaplePartyScheduleMapper partyScheduleMapper;
     @Override
-    public MapleParytScheduleVO insertMapleParytSchedule(MapleParytScheduleVO mapleParytScheduleVO) {
+    public int insertMapleParytSchedule(MapleParytScheduleVO mapleParytScheduleVO) {
         return this.partyScheduleMapper.insertMapleParytSchedule(mapleParytScheduleVO);
+    }
+
+    @Override
+    public MapleParytScheduleVO selectPartySchedule(MapleParytScheduleVO mapleParytScheduleVO) {
+        return this.partyScheduleMapper.selectPartySchedule(mapleParytScheduleVO);
     }
 }

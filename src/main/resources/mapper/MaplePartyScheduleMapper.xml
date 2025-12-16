@@ -8,24 +8,28 @@
             keyColumn="id">
 
         INSERT INTO maple_boss_paryt (
+        paryt_title,
         paryt_time,
         paryt_date,
         created_at,
         use_at
         )
         VALUES (
+        #{title},
         #{time},
         #{date},
         CURRENT_TIMESTAMP,
         'Y'
         )
     </insert>
-    <select id="" parameterType="com.let.domain.MapleParytScheduleVO" resultType="com.let.domain.MapleParytScheduleVO">
+
+    <select id="selectPartySchedule" parameterType="com.let.domain.MapleParytScheduleVO" resultType="com.let.domain.MapleParytScheduleVO">
         SELECT
             id,
-            boss_time,
-            boss_date,
-            use_at
+            paryt_title as title,
+            paryt_time as time,
+            paryt_date as date,
+            use_at as useAt
         from
             maple_boss_paryt
         where

@@ -115,6 +115,7 @@ public class SlashComandEvent extends ListenerAdapter {
         //보스파티 일정등록
         commandDatas.add(
                 Commands.slash("일정등록", "파티 일정을 등록합니다.")
+                        .addOption(OptionType.STRING, "일정명", "예: 검세칼카", true)
                         .addOption(OptionType.STRING, "날짜", "예: 2025.12.25 (yyyy.MM.dd)", true)
                         .addOption(OptionType.STRING, "시간", "예: 07:00 (HH:mm)", true)
         );
@@ -282,6 +283,7 @@ public class SlashComandEvent extends ListenerAdapter {
                 // 패턴은 문자열 형식이랑 정확히 맞춰야 함
                 String inputDate = Objects.requireNonNull(event.getOption("날짜")).getAsString();
                 String inputTime  = Objects.requireNonNull(event.getOption("시간")).getAsString();
+                String inputTitle  = Objects.requireNonNull(event.getOption("일정명")).getAsString();
 
                 //유효성 체크
                 boolean checkDateTime = this.mapleUtilService.checkDateTime(inputDate,inputTime);
@@ -306,9 +308,10 @@ public class SlashComandEvent extends ListenerAdapter {
                 Time bossTime = Time.valueOf(inputTime+":00");
 
                 //일정 등록 -> 키값은 vo 안에 있음
-                MapleParytScheduleVO parytVO = this.maplePartyScheduleService.insertMapleParytSchedule(new MapleParytScheduleVO(bossDate,bossTime));
+                MapleParytScheduleVO parytVO = new MapleParytScheduleVO(bossDate,bossTime,inputTitle);
+                int insertParyt = this.maplePartyScheduleService.insertMapleParytSchedule(parytVO);
 
-                if(parytVO != null && parytVO.getId() >0){
+                if(insertParyt <= 0){
                     event.reply("일정을 저장 중 오류가 발생했습니다.. 잠시후 다시시도 해주세요.")
                             .setEphemeral(true)
                             .queue();
@@ -317,10 +320,10 @@ public class SlashComandEvent extends ListenerAdapter {
                 // 유저 선택 셀렉트박스 생성
                 EntitySelectMenu menu = EntitySelectMenu
                         .create(String.valueOf(parytVO.getId()), EntitySelectMenu.SelectTarget.USER)
-                        .setPlaceholder("일정을 등록할 멤버를 선택하세요")
+                        .setPlaceholder("일정을 등록할 멤버를 선택하세요 (최소 2명 최대 6명)")
                         .setRequiredRange(2, 6) // 최소 2명, 최대 6명 선택
                         .build();
-                event.reply("일정을 등록할 멤버를 선택해 주세요.")
+                event.reply("일정을 등록할 멤버를 선택해 주세요. (최소 2명 최대 6명) ")
                         .addComponents(ActionRow.of(menu))
                         .setEphemeral(true) // 선택 UI는 본인만 보이게
                         .queue();

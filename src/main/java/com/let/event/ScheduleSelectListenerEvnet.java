@@ -1,8 +1,13 @@
 package com.let.event;
 
+import com.let.domain.MapleParytScheduleVO;
+import com.let.service.MaplePartyScheduleService;
+import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.component.EntitySelectInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -17,11 +22,25 @@ import java.util.List;
  * -----------------------------------------------------------
  * 25. 12. 16.        jun       최초 생성
  */
+@Component
+@RequiredArgsConstructor
 public class ScheduleSelectListenerEvnet extends ListenerAdapter {
+
+    @Autowired
+    private MaplePartyScheduleService maplePartyScheduleService;
 
     @Override
     public void onEntitySelectInteraction(EntitySelectInteractionEvent event){
-        if (!event.getComponentId().equals("schedule:user-select")) {
+
+        //키값으로 저장된 일정 조회
+        String key = event.getComponentId();
+        MapleParytScheduleVO scheduleVO = this.maplePartyScheduleService.selectPartySchedule(new MapleParytScheduleVO(Integer.parseInt(key)));
+
+        //유효성 체크
+        if(scheduleVO == null || scheduleVO.getId()<=0) {
+            event.reply("조회된 보스 일정이 없습니다.")
+                    .setEphemeral(true)
+                    .queue();
             return;
         }
 
@@ -33,10 +52,25 @@ public class ScheduleSelectListenerEvnet extends ListenerAdapter {
             return;
         }
 
+        //문구 작성 시작
         StringBuilder sb = new StringBuilder();
+        sb.append("📅 일정 등록 완료\n")
+                .append("일정 : ").append(scheduleVO.getTitle()).append("\n")
+                .append("날짜 : ").append(scheduleVO.getDate()).append("\n")
+                .append("시간 : ").append(scheduleVO.getTime()).append("\n")
+                .append("참여 멤버:\n");
 
-        for(User user : selectedUsers){
-
+        for (User user : selectedUsers) {
+            sb.append("- ").append(user.getAsMention()).append("\n");
+            // 필요하면 여기서 schedule_member 테이블 insert 등
         }
+
+        String[] ids = selectedUsers.stream()
+                .map(User::getId)
+                .toArray(String[]::new);
+
+        event.reply(sb.toString())
+                .mentionUsers(ids)   // 이 유저들 멘션 허용
+                .queue();
     }
 }

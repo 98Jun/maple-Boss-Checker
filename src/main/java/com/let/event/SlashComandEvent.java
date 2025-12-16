@@ -2,6 +2,7 @@ package com.let.event;
 
 import com.let.domain.MaplePointDutyCheckVO;
 import com.let.service.MapleDutyCheckService;
+import com.let.service.MapleUtilService;
 import com.let.service.impl.MapleDutyCheckMapper;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
@@ -17,9 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * packageName    : com.let.event
@@ -38,6 +37,8 @@ public class SlashComandEvent extends ListenerAdapter {
 
     @Autowired
     private MapleDutyCheckService mapleDutyCheckService;
+    @Autowired
+    private MapleUtilService mapleUtilService;
 
     @Value("${maple.api.key}")
     private String mapleApiKey;
@@ -47,17 +48,12 @@ public class SlashComandEvent extends ListenerAdapter {
         List<CommandData> commandDatas = new ArrayList<>();
 
         //서버 옵션
-        OptionData serverOption = new OptionData(
-                OptionType.STRING,
-                "서버",
-                "서버를 선택하세요",
-                true // required
-        )
-                .addChoice("베라", "BERRA")
-                .addChoice("스카니아", "SCANIA")
-                .addChoice("루나", "LUNA")
-                .addChoice("크로아", "CROA");
-
+        LinkedHashMap<String,String> servers = new LinkedHashMap<>();
+        servers.put("베라","BERRA");
+        servers.put("스카니아","SCANIA");
+        servers.put("루나","LUNA");
+        servers.put("크로아","CROA");
+        OptionData serverOption = this.mapleUtilService.setOptionData(OptionType.STRING,"서버","서버를 선택하세요",true,servers);
 
         commandDatas.add(
                 Commands.slash("관세계산기", "아이템의 관세를 계산합니다. (억 단위) 메포시세 미 입력 시 가장 최근에 검색된 값 사용")
@@ -70,49 +66,34 @@ public class SlashComandEvent extends ListenerAdapter {
         );
 
         //분배금 계산을 위한 옵션
-        OptionData pepleOption = new OptionData(
-                OptionType.STRING,
-                "분배인원",
-                "분배 인원을 설정 해주세요",
-                true // required
-        )
-                .addChoice("2", "2")
-                .addChoice("3", "3")
-                .addChoice("4", "4")
-                .addChoice("5", "5")
-                .addChoice("6", "6");
+        LinkedHashMap<String,String> peopleCount = new LinkedHashMap<>();
+        peopleCount.put("2","2");
+        peopleCount.put("3","3");
+        peopleCount.put("4","4");
+        peopleCount.put("5","5");
+        peopleCount.put("6","6");
+        OptionData peopleOption = this.mapleUtilService.setOptionData(OptionType.STRING,"분배인원","분배 인원을 설정 해주세요.",true,peopleCount);
 
-        OptionData chargeOption = new OptionData(
-                OptionType.STRING,
-                "수수료",
-                "수수료를 설정 해주세요",
-                true // required
-        )
-                .addChoice("5%", "5")
-                .addChoice("3%", "3");
+        //수수료
+        LinkedHashMap<String,String> charge = new LinkedHashMap<>();
+        charge.put("5%","5");
+        charge.put("3%","3");
+        OptionData chargeOption = this.mapleUtilService.setOptionData(OptionType.STRING,"수수료","수수료를 설정 해주세요.",true,charge);
 
-        OptionData distributionOption = new OptionData(
-                OptionType.STRING,
-                "분배구분",
-                "균등분배,자율분배",
-                true // required
-        )
-                .addChoice("균등", "균등")
-                .addChoice("자율", "자율");
+        //분배 구분
+        LinkedHashMap<String,String> distribution = new LinkedHashMap<>();
+        distribution.put("균등","균등");
+        distribution.put("자율","자율");
+        OptionData distributionOption = this.mapleUtilService.setOptionData(OptionType.STRING,"분배구분","균등분배, 자율분배",true,distribution);
 
-        OptionData ratioOption = new OptionData(
-                OptionType.STRING,
-                "배율",
-                "( 총비율 100, x:y:z 형식, 아이템 판매자(1번) 수수료 제외 ) 자율 분배일 경우 각 인원의 기여도  ex) 50:30:20",
-                false // ✅ UI 상으로는 optional
-        );
+        OptionData ratioOption = this.mapleUtilService.setOptionData(OptionType.STRING,"배율","( 총비율 100, x:y:z 형식, 아이템 판매자(1번) 수수료 제외 ) 자율 분배일 경우 각 인원의 기여도  ex) 50:30:20",false,null);
 
         commandDatas.add(
                     Commands.slash("분배금계산기", "분배금액(억 ")
                             .addOptions(
                                     new OptionData(OptionType.INTEGER, "아이템금액", "100 (억 단위)", true),
                                     chargeOption,
-                                    pepleOption,
+                                    peopleOption,
                                     distributionOption,
                                     ratioOption
                             )
@@ -125,7 +106,8 @@ public class SlashComandEvent extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event){
 
-        if(!event.getChannel().getId().equals("1448173918283108469")) return;
+        //고담 , 봇테 채널
+        if(!event.getChannel().getId().equals("1450034042517852182") && !event.getChannel().getId().equals("1448173918283108469")) return;
 
         String eventName = event.getName();
 
@@ -316,10 +298,8 @@ public class SlashComandEvent extends ListenerAdapter {
 
                 }
 
-
         }
 
-
-
     }
+
 }

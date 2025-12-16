@@ -25,7 +25,8 @@ public class MapleNameResponseEvent extends ListenerAdapter {
         if (event.getAuthor().isBot() || event.isWebhookMessage()) return;
 
         String id =event.getChannel().getId();
-        if(!id.equals("1448173918283108469")) return;
+        //고담 , 봇테 채널
+        if(!id.equals("1450034042517852182") && !id.equals("1448173918283108469")) return;
 
         //
         String message = event.getMessage().getContentDisplay();
@@ -33,10 +34,14 @@ public class MapleNameResponseEvent extends ListenerAdapter {
 
         event.getChannel().sendMessage("""
                         제가가진 명령어는 
-                        1. 관세 계산기
-                        2. 분배금 계산기
+                        1. 관세계산기 
+                            사용법 /관세계산기
+                        2. 분배금계산기
+                            사용법 /분배금계산기
                         3. 보스 일정 알리미(개발예정)
+                            사용법 /일정등록 
                         4. 간단한 캐릭터 정보조회 (개발예정 NEXON API 사용)
+                            사용법 /정보조회
                         입니다.
                         """).queue();
         }

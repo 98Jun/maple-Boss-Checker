@@ -86,6 +86,7 @@ public class SlashComandEvent extends ListenerAdapter {
         distribution.put("자율","자율");
         OptionData distributionOption = this.mapleUtilService.setOptionData(OptionType.STRING,"분배구분","균등분배, 자율분배",true,distribution);
 
+        //배율 50:20:30
         OptionData ratioOption = this.mapleUtilService.setOptionData(OptionType.STRING,"배율","( 총비율 100, x:y:z 형식, 아이템 판매자(1번) 수수료 제외 ) 자율 분배일 경우 각 인원의 기여도  ex) 50:30:20",false,null);
 
         commandDatas.add(
@@ -123,24 +124,22 @@ public class SlashComandEvent extends ListenerAdapter {
                 // 서버 값 읽기 (SCANIA / LUNA / CROA / BERRA...)
                 String server = Objects.requireNonNull(event.getOption("서버")).getAsString();
 
-                // 👉 메포시세를 입력했는지 체크
-                Integer maplePoint;
+                // 메포시세를 입력했는지 체크
+                Integer maplePoint = null;
+                try {
+                    maplePoint = this.mapleDutyCheckService.checkCommandMaplePoint(mapleOption,server);
 
-
-                if (mapleOption != null) {
-                    // 1) 사용자가 메포시세를 직접 입력한 경우 → 그 값 사용
-                    maplePoint = mapleOption.getAsInt();
-                    this.mapleDutyCheckService.insertMaplePointHistory(new MaplePointDutyCheckVO(maplePoint,server));
-                } else {
-                    // 2) 입력 안 했으면 → DB에서 가져오기
-                    maplePoint = this.mapleDutyCheckService.searchLastMaplePoint(server);
-
-                    if (maplePoint == null) {
-                        // 3) DB에도 없으면 에러 응답
-                        event.reply("수집된 메이플 포인트 시세가 없습니다. 메이플 포인트 시세를 입력 해 다시 시도 해주세요.").queue();
-                        break;
-                    }
+                    if(maplePoint == null)  event.reply("수집된 메이플 포인트 시세가 없습니다. 메이플 포인트 시세를 입력 해 다시 시도 해주세요.").queue();
+                }catch (Exception e){
+                    event.reply("""
+                            메이플 포인트 시세 서버와의 연결에 문제가 있어 조회할 수 없습니다.
+                            잠시 후 다시 시도해 주세요.
+                            """)
+                            .setEphemeral(true)
+                            .queue();
+                    return;
                 }
+
                 //바꿔야할 메소(억단위)
                 int myPayMeso = (itemPay / 10);
                 //충전해야할 메이플 포인트 금액
@@ -247,7 +246,7 @@ public class SlashComandEvent extends ListenerAdapter {
                                     .divide(BigDecimal.valueOf(100), 4, java.math.RoundingMode.HALF_UP);
 
                             BigDecimal gross = sumAmt.multiply(peoplePercent);                        // 교환창에 올릴 금액
-                            BigDecimal net   = gross.multiply(BigDecimal.valueOf(fee));               // 실 수령 금액
+                            BigDecimal net   = gross.multiply(BigDecimal.valueOf(0.95));               // 실 수령 금액
 
                             shareList.add(new BigDecimal[]{ gross, net });
                         }

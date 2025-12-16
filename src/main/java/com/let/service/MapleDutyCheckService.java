@@ -1,6 +1,8 @@
 package com.let.service;
 
 import com.let.domain.MaplePointDutyCheckVO;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 /**
  * packageName    : com.let.service
@@ -18,4 +20,6 @@ public interface MapleDutyCheckService {
     Integer searchLastMaplePoint(String server);
 
     Integer insertMaplePointHistory(MaplePointDutyCheckVO vo);
+
+    Integer checkCommandMaplePoint(OptionMapping mapleOption, String server);
 }

@@ -1,6 +1,8 @@
 package com.let.domain;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import net.dv8tion.jda.api.entities.User;
@@ -21,13 +23,15 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
-public class MapleparytMemberVO {
+@NoArgsConstructor
+public class MaplepartyMemberVO {
+    @Schema(example = "1",description = "일정 키값 아이디 (maple_boss_party 의 id)")
     private int partyId;
-    private List<User> members;
+    @Schema(example = "123123 ...",description = "일정에 태그된 회원들")
+    private List<String> members;
 
-    public  MapleparytMemberVO(int partyId, List<User> members) {
+    public MaplepartyMemberVO(int partyId, List<String> members) {
         this.partyId = partyId;
         this.members = members;
     }
-    public  MapleparytMemberVO() {}
 }

@@ -1,7 +1,8 @@
 package com.let.domain;
 
-import lombok.Builder;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -22,24 +23,30 @@ import java.util.Date;
 @Getter
 @Setter
 @ToString
-public class MapleParytScheduleVO {
+@NoArgsConstructor
+public class MaplePartyScheduleVO {
+    @Schema(example = "1",description = "일정 키값 아이디")
     private int id;
+    @Schema(example = "일정일걸요",description = "일정명")
     private String title;
+    @Schema(example = "131294820",description = "호출 채널 아이디")
     private String channelId;
+    @Schema(example = "yyyy.MM.dd",description = "일정 설정 날짜")
     private Date date;
+    @Schema(example = "HH:mm",description = "일정 설정 시간")
     private Time time;
+    @Schema(example = "Y",description = "알림호출여부 Y/N " )
     private String useAt;
 
-    public MapleParytScheduleVO(Date date, Time time,String title,String channelId) {
+    public MaplePartyScheduleVO(Date date, Time time, String title, String channelId) {
         this.date = date;
         this.time = time;
         this.title = title;
         this.channelId = channelId;
     }
-    public MapleParytScheduleVO(int id){
+    public MaplePartyScheduleVO(int id){
         this.id = id;
     }
-    public MapleParytScheduleVO(){
 
-    }
 }
+

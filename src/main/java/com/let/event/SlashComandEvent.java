@@ -1,8 +1,6 @@
 package com.let.event;
 
-import com.let.domain.MapleParytScheduleVO;
-import com.let.domain.MaplePointDutyCheckVO;
-import com.let.domain.MapleparytMemberVO;
+import com.let.domain.MaplePartyScheduleVO;
 import com.let.service.MapleDistributionService;
 import com.let.service.MapleDutyCheckService;
 import com.let.service.MaplePartyScheduleService;
@@ -310,7 +308,7 @@ public class SlashComandEvent extends ListenerAdapter {
                 Time bossTime = Time.valueOf(inputTime+":00");
 
                 //일정 등록 -> 키값은 vo 안에 있음
-                MapleParytScheduleVO parytVO = new MapleParytScheduleVO(bossDate,bossTime,inputTitle,channelId);
+                MaplePartyScheduleVO parytVO = new MaplePartyScheduleVO(bossDate,bossTime,inputTitle,channelId);
                 int insertParyt = this.maplePartyScheduleService.insertMapleParytSchedule(parytVO);
 
                 if(insertParyt <= 0){

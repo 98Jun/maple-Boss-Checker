@@ -1,6 +1,7 @@
 package com.let.service;
 
 import com.let.domain.MapleParytScheduleVO;
+import com.let.domain.MapleparytMemberVO;
 
 /**
  * packageName    : com.let.service
@@ -17,4 +18,6 @@ public interface MaplePartyScheduleService {
     int insertMapleParytSchedule(MapleParytScheduleVO mapleParytScheduleVO);
 
     MapleParytScheduleVO selectPartySchedule(MapleParytScheduleVO mapleParytScheduleVO);
+
+    int insertPartyMemberList(MapleparytMemberVO memberVO);
 }

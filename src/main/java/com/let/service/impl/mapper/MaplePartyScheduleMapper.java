@@ -1,6 +1,7 @@
 package com.let.service.impl.mapper;
 
 import com.let.domain.MapleParytScheduleVO;
+import com.let.domain.MapleparytMemberVO;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -19,4 +20,6 @@ public interface MaplePartyScheduleMapper {
     int insertMapleParytSchedule(MapleParytScheduleVO mapleParytScheduleVO);
 
     MapleParytScheduleVO selectPartySchedule(MapleParytScheduleVO mapleParytScheduleVO);
+
+    int insertPartyMemberList(MapleparytMemberVO memberVO);
 }

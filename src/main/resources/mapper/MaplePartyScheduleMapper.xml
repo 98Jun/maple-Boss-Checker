@@ -7,8 +7,9 @@
             keyProperty="id"
             keyColumn="id">
 
-        INSERT INTO maple_boss_paryt (
+        INSERT INTO maple_boss_party (
         paryt_title,
+        channel_id,
         paryt_time,
         paryt_date,
         created_at,
@@ -16,6 +17,7 @@
         )
         VALUES (
         #{title},
+        #{channelId},
         #{time},
         #{date},
         CURRENT_TIMESTAMP,
@@ -23,15 +25,24 @@
         )
     </insert>
 
+    <insert id="insertPartyMemberList" parameterType="com.let.domain.MapleparytMemberVO">
+        INSERT INTO maple_party_member (party_id, discord_user_id)
+        VALUES
+        <foreach collection="members" item="member" separator=",">
+            (#{partyId}, #{member.id})
+        </foreach>
+    </insert>
+
     <select id="selectPartySchedule" parameterType="com.let.domain.MapleParytScheduleVO" resultType="com.let.domain.MapleParytScheduleVO">
         SELECT
             id,
             paryt_title as title,
+            channel_id as channelId,
             paryt_time as time,
             paryt_date as date,
             use_at as useAt
         from
-            maple_boss_paryt
+            maple_boss_party
         where
             id = #{id}
     </select>

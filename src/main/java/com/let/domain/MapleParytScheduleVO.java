@@ -25,14 +25,16 @@ import java.util.Date;
 public class MapleParytScheduleVO {
     private int id;
     private String title;
+    private String channelId;
     private Date date;
     private Time time;
     private String useAt;
 
-    public MapleParytScheduleVO(Date date, Time time,String title) {
+    public MapleParytScheduleVO(Date date, Time time,String title,String channelId) {
         this.date = date;
         this.time = time;
         this.title = title;
+        this.channelId = channelId;
     }
     public MapleParytScheduleVO(int id){
         this.id = id;

@@ -2,6 +2,7 @@ package com.let.event;
 
 import com.let.domain.MapleParytScheduleVO;
 import com.let.domain.MaplePointDutyCheckVO;
+import com.let.domain.MapleparytMemberVO;
 import com.let.service.MapleDistributionService;
 import com.let.service.MapleDutyCheckService;
 import com.let.service.MaplePartyScheduleService;
@@ -125,9 +126,10 @@ public class SlashComandEvent extends ListenerAdapter {
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event){
-
+        // 문자열 채널 ID
+        String channelId = event.getChannel().getId();
         //고담 , 봇테 채널
-        if(!event.getChannel().getId().equals("1450034042517852182") && !event.getChannel().getId().equals("1448173918283108469")) return;
+        if(!channelId.equals("1450034042517852182") && !channelId.equals("1448173918283108469")) return;
 
         String eventName = event.getName();
 
@@ -308,7 +310,7 @@ public class SlashComandEvent extends ListenerAdapter {
                 Time bossTime = Time.valueOf(inputTime+":00");
 
                 //일정 등록 -> 키값은 vo 안에 있음
-                MapleParytScheduleVO parytVO = new MapleParytScheduleVO(bossDate,bossTime,inputTitle);
+                MapleParytScheduleVO parytVO = new MapleParytScheduleVO(bossDate,bossTime,inputTitle,channelId);
                 int insertParyt = this.maplePartyScheduleService.insertMapleParytSchedule(parytVO);
 
                 if(insertParyt <= 0){
@@ -317,6 +319,7 @@ public class SlashComandEvent extends ListenerAdapter {
                             .queue();
                     break;
                 }
+
                 // 유저 선택 셀렉트박스 생성
                 EntitySelectMenu menu = EntitySelectMenu
                         .create(String.valueOf(parytVO.getId()), EntitySelectMenu.SelectTarget.USER)

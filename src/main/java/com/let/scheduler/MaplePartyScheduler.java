@@ -37,8 +37,8 @@ public class MaplePartyScheduler {
     @Autowired
     private final MaplePartyScheduleService maplePartyScheduleService;
 
-//    @Scheduled(cron = "0 0 * * * *", zone = "Asia/Seoul")
-    @Scheduled(cron = "0 */5 * * * *", zone = "Asia/Seoul") //테스트
+    @Scheduled(cron = "0 0 * * * *", zone = "Asia/Seoul")
+//    @Scheduled(cron = "0 */5 * * * *", zone = "Asia/Seoul") //테스트
     public void checkParty() {
         //일정이 있는지 조회
         List<MaplePartySearchVO> memberVOList = this.maplePartyScheduleService.searchPartySchedule();

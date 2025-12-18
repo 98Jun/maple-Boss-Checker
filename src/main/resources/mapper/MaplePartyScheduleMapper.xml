@@ -77,4 +77,12 @@
         ORDER BY b.id
 
     </select>
+    <update id="updatePartyUseAt" parameterType="com.let.domain.MaplePartySearchVO" >
+        update
+            maple_boss_party
+        set
+            use_at = 'N'
+        where
+            id = #{id}
+    </update>
 </mapper>

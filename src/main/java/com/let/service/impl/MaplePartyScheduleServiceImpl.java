@@ -64,4 +64,9 @@ public class MaplePartyScheduleServiceImpl implements MaplePartyScheduleService 
 
         return diff <= 120; // 0분
     }
+
+    @Override
+    public int updatePartyUseAt(MaplePartySearchVO schedule) {
+        return this.partyScheduleMapper.updatePartyUseAt(schedule);
+    }
 }

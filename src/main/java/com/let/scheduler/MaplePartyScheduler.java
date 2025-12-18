@@ -37,8 +37,8 @@ public class MaplePartyScheduler {
     @Autowired
     private final MaplePartyScheduleService maplePartyScheduleService;
 
-    @Scheduled(cron = "0 0 * * * *", zone = "Asia/Seoul")
-//    @Scheduled(cron = "0 */5 * * * *", zone = "Asia/Seoul") //테스트
+//    @Scheduled(cron = "0 0 * * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 */5 * * * *", zone = "Asia/Seoul") //테스트
     public void checkParty() {
         //일정이 있는지 조회
         List<MaplePartySearchVO> memberVOList = this.maplePartyScheduleService.searchPartySchedule();
@@ -49,7 +49,12 @@ public class MaplePartyScheduler {
             boolean afterTimeCheck  = maplePartyScheduleService.isWithinNextTwoHours(schedule.getTime(), Clock.systemDefaultZone());
             if(!afterTimeCheck) continue;
 
+            //호출 할 멤버가 없으면 실행하지 않는다
             List<String> partyUser = schedule.getMemberDiscordId();
+            if(partyUser == null || partyUser.isEmpty() ){
+                this.maplePartyScheduleService.updatePartyUseAt(schedule);
+                continue;
+            }
 
             // 3) 멘션 문자열 만들기: <@123><@456>...
             String mentions = partyUser.stream()
@@ -71,7 +76,7 @@ public class MaplePartyScheduler {
 
             // 5) 전송
             channel.sendMessage(message).queue(
-                    ok -> log.info("알림 전송 성공 "), // 성공 시 알림 처리
+                    ok -> this.maplePartyScheduleService.updatePartyUseAt(schedule), // 성공 시 알림 처리
                     err -> log.error("알림 전송 실패 scheduleId={}", schedule.getId(), err)
             );
         }

@@ -27,4 +27,6 @@ public interface MaplePartyScheduleMapper {
     int insertPartyMemberList(MaplepartyMemberVO memberVO);
 
     List<MaplePartySearchVO> searchPartySchedule();
+
+    int updatePartyUseAt(MaplePartySearchVO schedule);
 }

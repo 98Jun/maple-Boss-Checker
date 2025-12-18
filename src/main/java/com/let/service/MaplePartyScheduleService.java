@@ -29,4 +29,6 @@ public interface MaplePartyScheduleService {
     List<MaplePartySearchVO> searchPartySchedule();
 
     boolean isWithinNextTwoHours(Time target, Clock clock);
+
+    int updatePartyUseAt(MaplePartySearchVO schedule);
 }

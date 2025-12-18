@@ -25,7 +25,7 @@
         )
     </insert>
 
-    <insert id="insertPartyMemberList" parameterType="com.let.domain.MaplepartyMemberVO">
+    <insert id="insertPartyMemberList" parameterType="com.let.domain.MaplePartyMemberVO">
         INSERT INTO maple_party_member (party_id, discord_user_id)
         VALUES
         <foreach collection="members" item="member" separator=",">

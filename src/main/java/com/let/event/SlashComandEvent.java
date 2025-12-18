@@ -119,6 +119,11 @@ public class SlashComandEvent extends ListenerAdapter {
                         .addOption(OptionType.STRING, "시간", "예: 07:00 (HH:mm)", true)
         );
 
+        commandDatas.add(
+                Commands.slash("캐릭터조회", "캐리터명으로 캐릭터의 정보를 조회합니다.")
+                        .addOption(OptionType.STRING, "캐릭터명", "쓰낵", true)
+        );
+
         event.getGuild().updateCommands().addCommands(commandDatas).queue();
     }
 

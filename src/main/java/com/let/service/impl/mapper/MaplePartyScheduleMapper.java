@@ -2,7 +2,7 @@ package com.let.service.impl.mapper;
 
 import com.let.domain.MaplePartyScheduleVO;
 import com.let.domain.MaplePartySearchVO;
-import com.let.domain.MaplepartyMemberVO;
+import com.let.domain.MaplePartyMemberVO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -24,7 +24,7 @@ public interface MaplePartyScheduleMapper {
 
     MaplePartyScheduleVO selectPartySchedule(MaplePartyScheduleVO maplePartyScheduleVO);
 
-    int insertPartyMemberList(MaplepartyMemberVO memberVO);
+    int insertPartyMemberList(MaplePartyMemberVO memberVO);
 
     List<MaplePartySearchVO> searchPartySchedule();
 

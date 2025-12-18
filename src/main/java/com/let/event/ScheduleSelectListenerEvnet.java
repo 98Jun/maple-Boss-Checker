@@ -1,7 +1,7 @@
 package com.let.event;
 
 import com.let.domain.MaplePartyScheduleVO;
-import com.let.domain.MaplepartyMemberVO;
+import com.let.domain.MaplePartyMemberVO;
 import com.let.service.MaplePartyScheduleService;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.User;
@@ -53,7 +53,7 @@ public class ScheduleSelectListenerEvnet extends ListenerAdapter {
             return;
         }
         //일정등록 이후 보스파티 등록
-        MaplepartyMemberVO memberVO = new MaplepartyMemberVO(scheduleVO.getId(),selectedUsers.stream().map(User::getId).toList());
+        MaplePartyMemberVO memberVO = new MaplePartyMemberVO(scheduleVO.getId(),selectedUsers.stream().map(User::getId).toList());
         int insertMemberParty = this.maplePartyScheduleService.insertPartyMemberList(memberVO);
         if(insertMemberParty <= 0){
             event.reply("일정 유저 저장 중 오류가 발생했습니다..").setEphemeral(true).queue();

@@ -1,7 +1,6 @@
 package com.let.scheduler;
 
 import com.let.domain.MaplePartySearchVO;
-import com.let.domain.MaplepartyMemberVO;
 import com.let.service.MaplePartyScheduleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +11,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.Clock;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 

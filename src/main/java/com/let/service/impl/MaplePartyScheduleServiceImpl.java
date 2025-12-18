@@ -2,7 +2,7 @@ package com.let.service.impl;
 
 import com.let.domain.MaplePartyScheduleVO;
 import com.let.domain.MaplePartySearchVO;
-import com.let.domain.MaplepartyMemberVO;
+import com.let.domain.MaplePartyMemberVO;
 import com.let.service.MaplePartyScheduleService;
 import com.let.service.impl.mapper.MaplePartyScheduleMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ public class MaplePartyScheduleServiceImpl implements MaplePartyScheduleService 
     }
 
     @Override
-    public int insertPartyMemberList(MaplepartyMemberVO memberVO) {
+    public int insertPartyMemberList(MaplePartyMemberVO memberVO) {
         return this.partyScheduleMapper.insertPartyMemberList(memberVO);
     }
 

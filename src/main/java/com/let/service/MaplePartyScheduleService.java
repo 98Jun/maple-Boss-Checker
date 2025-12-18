@@ -2,7 +2,7 @@ package com.let.service;
 
 import com.let.domain.MaplePartyScheduleVO;
 import com.let.domain.MaplePartySearchVO;
-import com.let.domain.MaplepartyMemberVO;
+import com.let.domain.MaplePartyMemberVO;
 
 import java.sql.Time;
 import java.time.Clock;
@@ -24,7 +24,7 @@ public interface MaplePartyScheduleService {
 
     MaplePartyScheduleVO selectPartySchedule(MaplePartyScheduleVO maplePartyScheduleVO);
 
-    int insertPartyMemberList(MaplepartyMemberVO memberVO);
+    int insertPartyMemberList(MaplePartyMemberVO memberVO);
 
     List<MaplePartySearchVO> searchPartySchedule();
 

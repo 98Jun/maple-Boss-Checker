@@ -1,11 +1,14 @@
 package com.let.event;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.let.client.NexonApiClient;
 import com.let.domain.MaplePartyScheduleVO;
 import com.let.service.MapleDistributionService;
 import com.let.service.MapleDutyCheckService;
 import com.let.service.MaplePartyScheduleService;
 import com.let.service.MapleUtilService;
 import lombok.RequiredArgsConstructor;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.selections.EntitySelectMenu;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
@@ -18,12 +21,18 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.math.BigDecimal;
 import java.sql.Time;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -49,9 +58,9 @@ public class SlashComandEvent extends ListenerAdapter {
     private MapleDistributionService mapleDistributionService;
     @Autowired
     private MaplePartyScheduleService maplePartyScheduleService;
+    @Autowired
+    private NexonApiClient nexonApiClient;
 
-    @Value("${maple.api.key}")
-    private String mapleApiKey;
 
     @Override
     public void onGuildReady(GuildReadyEvent event) {
@@ -333,6 +342,61 @@ public class SlashComandEvent extends ListenerAdapter {
                         .addComponents(ActionRow.of(menu))
                         .setEphemeral(true) // 선택 UI는 본인만 보이게
                         .queue();
+
+                break;
+            case "캐릭터조회" :
+                //오늘날
+                LocalDate now = LocalDate.now();
+                String nowDateFormat = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+                String inputName = Objects.requireNonNull(event.getOption("캐릭터명")).getAsString();
+
+                //캐릭터의 키 값 조회
+                //JDA 의 경우는 응답을 빠르게 처리해야해서 비동기로 처리 할 수 있도록 추가
+                event.deferReply(false).queue(hook -> {
+                    //캐릭터 고유 키값 체크
+                    nexonApiClient.getJson("/maplestory/v1/id", Map.of("character_name", inputName))
+                            .map(json -> json.path("ocid").asText(""))
+                            .flatMap(ocid -> {
+
+                                //키값 유효성 검증
+                                if (ocid.isBlank()) {
+                                    return reactor.core.publisher.Mono.error(new IllegalStateException("ocid가 비어있음"));
+                                }
+                                // ocid로 다음 API 호출
+                                return nexonApiClient.getJson("/maplestory/v1/character/basic", Map.of("ocid", ocid));
+                            })
+                            .subscribe(
+                                    basicJson -> {
+                                        //조회한 캐릭터 정보
+                                        String characterName = basicJson.path("character_name").asText("");
+                                        int level = basicJson.path("character_level").asInt(0);
+                                        String characterClass = basicJson.path("character_class").asText("");
+                                        String characterExpRate = basicJson.path("character_exp_rate").asText("");
+                                        String characterGuildName = basicJson.path("character_guild_name").asText("");
+
+                                        //캐릭터 이미지
+                                        var eb = new EmbedBuilder()
+                                                .setTitle("캐릭터 이미지")
+                                                .setImage(basicJson.path("character_image").asText("")); // 공개로 접근 가능한 이미지 URL
+
+                                        String resultMsg = """
+                                            
+                                            캐릭터 명 : %s
+                                            레벨 : %s
+                                            직업 : %s
+                                            경험치 : %s
+                                            길드 : %s
+                                            
+                                            """.formatted(characterName,level,characterClass, characterExpRate, characterGuildName);
+
+                                        hook.editOriginal(resultMsg)
+                                                .setEmbeds(eb.build())
+                                                .queue();
+                                    },
+                                    err -> hook.editOriginal("API 호출 실패: " + err.getMessage()).queue()
+                            );
+                });
 
                 break;
         }

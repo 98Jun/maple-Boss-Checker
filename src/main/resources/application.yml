@@ -9,6 +9,9 @@ maple:
   api:
     key: ${MAPLE_API_KEY}
 
+nexon:
+  api:
+    base-url: https://open.api.nexon.com
 
 spring:
   h2:

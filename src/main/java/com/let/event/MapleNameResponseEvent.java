@@ -38,10 +38,10 @@ public class MapleNameResponseEvent extends ListenerAdapter {
                             사용법 /관세계산기
                         2. 분배금계산기
                             사용법 /분배금계산기
-                        3. 보스 일정 알리미(개발예정)
+                        3. 보스 일정 알리미
                             사용법 /일정등록 
                         4. 간단한 캐릭터 정보조회 (개발예정 NEXON API 사용)
-                            사용법 /정보조회
+                            사용법 /캐릭터조회
                         입니다.
                         """).queue();
         }

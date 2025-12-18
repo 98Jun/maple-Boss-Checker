@@ -29,7 +29,7 @@
         INSERT INTO maple_party_member (party_id, discord_user_id)
         VALUES
         <foreach collection="members" item="member" separator=",">
-            (#{partyId}, #{member.id})
+            (#{partyId}, #{member})
         </foreach>
     </insert>
 
@@ -48,29 +48,33 @@
     </select>
 
     <resultMap id="searchScheduleMap" type="com.let.domain.MaplePartySearchVO">
-        <result property="id" column="id"/>
+        <!-- 부모(스케줄) 한 건을 묶어주기 위한 키: join 결과(멤버 N명)에서 컬렉션이 제대로 합쳐지려면 <id>가 필요 -->
+        <id property="id" column="id"/>
         <result property="title" column="title"/>
         <result property="channelId" column="channelId"/>
-        <result property="time" column="time"/>
-        <result property="date" column="date"/>
-        <collection property="memberDiscordId" javaType="java.util.ArrayList" ofType="string">
+        <result property="time" column="time" jdbcType="TIME"/>
+        <result property="date" column="date" jdbcType="DATE"/>
+        <!-- 멤버는 row마다 1개씩 오므로 List로 누적 -->
+        <collection property="memberDiscordId" ofType="java.lang.String">
             <result column="memberDiscordId"/>
         </collection>
     </resultMap>
     <select id="searchPartySchedule" resultMap="searchScheduleMap">
         SELECT
-            b.id,
-            b.party_title as title,
-            b.channel_id as channelId,
-            b.party_time as time,
-            b.party_date as date,
-            m.discord_user_id as memberDiscordId
+            b.id as "id",
+            b.party_title as "title",
+            b.channel_id as "channelId",
+            b.party_time as "time",
+            b.party_date as "date",
+            m.discord_user_id as "memberDiscordId"
         FROM
             maple_boss_party b
             inner join maple_party_member m on b.id = m.party_id
         WHERE
-            use_at = 'Y'  and
-            party_date >= FORMATDATETIME(CURRENT_TIMESTAMP(), 'yyyy-MM-dd')
+            b.use_at = 'Y'
+            AND b.party_date >= CURRENT_DATE
+            AND b.party_time >= CURRENT_TIME
+        ORDER BY b.id
 
     </select>
 </mapper>

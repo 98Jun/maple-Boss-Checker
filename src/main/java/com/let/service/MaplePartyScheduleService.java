@@ -1,8 +1,11 @@
 package com.let.service;
 
 import com.let.domain.MaplePartyScheduleVO;
+import com.let.domain.MaplePartySearchVO;
 import com.let.domain.MaplepartyMemberVO;
 
+import java.sql.Time;
+import java.time.Clock;
 import java.util.List;
 
 /**
@@ -23,5 +26,7 @@ public interface MaplePartyScheduleService {
 
     int insertPartyMemberList(MaplepartyMemberVO memberVO);
 
-    List<MaplepartyMemberVO> searchPartySchedule();
+    List<MaplePartySearchVO> searchPartySchedule();
+
+    boolean isWithinNextTwoHours(Time target, Clock clock);
 }

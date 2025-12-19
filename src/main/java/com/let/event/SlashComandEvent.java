@@ -357,45 +357,88 @@ public class SlashComandEvent extends ListenerAdapter {
                     //캐릭터 고유 키값 체크
                     nexonApiClient.getJson("/maplestory/v1/id", Map.of("character_name", inputName))
                             .map(json -> json.path("ocid").asText(""))
-                            .flatMap(ocid -> {
+//                            .flatMap(ocid -> {
+//
+//                                //키값 유효성 검증
+//                                if (ocid.isBlank()) {
+//                                    return reactor.core.publisher.Mono.error(new IllegalStateException("ocid가 비어있음"));
+//                                }
+//                                // ocid로 다음 API 호출
+//                                return nexonApiClient.getJson("/maplestory/v1/character/basic", Map.of("ocid", ocid));
+//                            })
+//                            .subscribe(
+//                                    basicJson -> {
+//                                        //조회한 캐릭터 정보
+//                                        String characterName = basicJson.path("character_name").asText("");
+//                                        int level = basicJson.path("character_level").asInt(0);
+//                                        String characterClass = basicJson.path("character_class").asText("");
+//                                        String characterExpRate = basicJson.path("character_exp_rate").asText("");
+//                                        String characterGuildName = basicJson.path("character_guild_name").asText("");
+//
+//                                        //캐릭터 이미지
+//                                        var eb = new EmbedBuilder()
+//                                                .setTitle("캐릭터 이미지")
+//                                                .setImage(basicJson.path("character_image").asText("")); // 공개로 접근 가능한 이미지 URL
+//
+//                                        String resultMsg = """
+//                                            조회일자 : %s
+//
+//                                            캐릭터 명 : %s
+//                                            레벨 : %s
+//                                            직업 : %s
+//                                            경험치 : %s
+//                                            길드 : %s
+//
+//                                            """.formatted(nowDateFormat,characterName,level,characterClass, characterExpRate, characterGuildName);
+//
+//                                        hook.editOriginal(resultMsg)
+//                                                .setEmbeds(eb.build())
+//                                                .queue();
+//                                    },
+//                                    err -> hook.editOriginal("API 호출 실패: " + err.getMessage()).queue()
+//                            );
+                            .flatMap(ocid -> reactor.core.publisher.Mono.zip(
+                                    nexonApiClient.getJson("/maplestory/v1/character/basic", Map.of("ocid", ocid)),
+                                    nexonApiClient.getJson("/maplestory/v1/character/stat", Map.of("ocid", ocid)),
+                                    nexonApiClient.getJson("/maplestory/v1/character/item-equipment", Map.of("ocid", ocid))
+                            ))
+                            .subscribe(tuple -> {
 
-                                //키값 유효성 검증
-                                if (ocid.isBlank()) {
-                                    return reactor.core.publisher.Mono.error(new IllegalStateException("ocid가 비어있음"));
-                                }
-                                // ocid로 다음 API 호출
-                                return nexonApiClient.getJson("/maplestory/v1/character/basic", Map.of("ocid", ocid));
-                            })
-                            .subscribe(
-                                    basicJson -> {
-                                        //조회한 캐릭터 정보
-                                        String characterName = basicJson.path("character_name").asText("");
-                                        int level = basicJson.path("character_level").asInt(0);
-                                        String characterClass = basicJson.path("character_class").asText("");
-                                        String characterExpRate = basicJson.path("character_exp_rate").asText("");
-                                        String characterGuildName = basicJson.path("character_guild_name").asText("");
+                                JsonNode basic = tuple.getT1();
 
-                                        //캐릭터 이미지
-                                        var eb = new EmbedBuilder()
-                                                .setTitle("캐릭터 이미지")
-                                                .setImage(basicJson.path("character_image").asText("")); // 공개로 접근 가능한 이미지 URL
+                                //캐릭터 기본 정보
+                                String characterName = basic.path("character_name").asText("");
+                                int level = basic.path("character_level").asInt(0);
+                                String characterClass = basic.path("character_class").asText("");
+                                String characterExpRate = basic.path("character_exp_rate").asText("");
+                                String characterGuildName = basic.path("character_guild_name").asText("");
+                                //캐릭터 이미지
+                                var eb = new EmbedBuilder()
+                                        .setTitle("캐릭터 이미지")
+                                        .setImage(basic.path("character_image").asText("")); // 공개로 접근 가능한 이미지 URL
+                                JsonNode stat  = tuple.getT2();
+                                JsonNode equip = tuple.getT3();
+
+
+                                System.out.println(stat);
+                                System.out.println("---");
+                                System.out.println(equip);
 
                                         String resultMsg = """
-                                            
+                                            조회일자 : %s
+
                                             캐릭터 명 : %s
                                             레벨 : %s
                                             직업 : %s
                                             경험치 : %s
                                             길드 : %s
-                                            
-                                            """.formatted(characterName,level,characterClass, characterExpRate, characterGuildName);
+
+                                            """.formatted(nowDateFormat,characterName,level,characterClass, characterExpRate, characterGuildName);
 
                                         hook.editOriginal(resultMsg)
                                                 .setEmbeds(eb.build())
                                                 .queue();
-                                    },
-                                    err -> hook.editOriginal("API 호출 실패: " + err.getMessage()).queue()
-                            );
+                            }, err -> hook.editOriginal("실패: " + err.getMessage()).queue());
                 });
 
                 break;

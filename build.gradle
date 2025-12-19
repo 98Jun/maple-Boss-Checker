@@ -51,8 +51,12 @@ dependencies {
     implementation 'org.json:json:20240303'
     // Swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4'
-    //h2 내부디비
-    runtimeOnly 'com.h2database:h2'
+
+    // h2 휘발성 데이터 베이스 사용 시 주석 해제 필요
+//    runtimeOnly 'com.h2database:h2'
+
+    //
+    runtimeOnly 'org.postgresql:postgresql'
 }
 
 tasks.named('test') {

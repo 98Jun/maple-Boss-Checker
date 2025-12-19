@@ -10,7 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Clock;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,13 +40,16 @@ public class MaplePartyScheduler {
 
     @Scheduled(cron = "0 0 * * * *", zone = "Asia/Seoul")
 //    @Scheduled(cron = "0 */5 * * * *", zone = "Asia/Seoul") //테스트
-    public void checkParty() {
+    public void checkParty() throws ParseException {
         //일정이 있는지 조회
         List<MaplePartySearchVO> memberVOList = this.maplePartyScheduleService.searchPartySchedule();
         //
         for(MaplePartySearchVO schedule : memberVOList){
 
             // 두시간 전  체크
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            boolean afterDateCheck = schedule.getDate().equals(formatter.parse(String.valueOf(LocalDate.now())));
+            if(!afterDateCheck) continue;
             boolean afterTimeCheck  = maplePartyScheduleService.isWithinNextTwoHours(schedule.getTime(), Clock.systemDefaultZone());
             if(!afterTimeCheck) continue;
 

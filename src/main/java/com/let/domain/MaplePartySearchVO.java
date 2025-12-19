@@ -37,7 +37,7 @@ public class MaplePartySearchVO {
     @Schema(example = "HH:mm",description = "일정 설정 시간")
     private Time time;
 
-    @Schema(example = "1239812031",description = "일정 참여 멤버 디스코드 아이디" )
-    private List<String> memberDiscordId;
+    @Schema(example = "1239812031",description = "일정 참여 멤버 디스코드 아이디 및 회원 이름 " )
+    private List<MemberVO> member;
 
 }

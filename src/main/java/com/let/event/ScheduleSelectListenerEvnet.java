@@ -2,6 +2,7 @@ package com.let.event;
 
 import com.let.domain.MaplePartyScheduleVO;
 import com.let.domain.MaplePartyMemberVO;
+import com.let.domain.MemberVO;
 import com.let.service.MaplePartyScheduleService;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.User;
@@ -52,13 +53,23 @@ public class ScheduleSelectListenerEvnet extends ListenerAdapter {
             event.reply("선택된 유저가 없습니다. 다시 시도해주세요.").setEphemeral(true).queue();
             return;
         }
+
         //일정등록 이후 보스파티 등록
-        MaplePartyMemberVO memberVO = new MaplePartyMemberVO(scheduleVO.getId(),selectedUsers.stream().map(User::getId).toList());
+        List<MemberVO> members = selectedUsers.stream()
+                .map(u -> {
+                    MemberVO vo = new MemberVO();
+                    vo.setMemberDiscordId(u.getId());
+                    vo.setMemberName(u.getGlobalName());
+                    return vo;
+                })
+                .toList();
+        MaplePartyMemberVO memberVO = new MaplePartyMemberVO(scheduleVO.getId(), members);
         int insertMemberParty = this.maplePartyScheduleService.insertPartyMemberList(memberVO);
         if(insertMemberParty <= 0){
             event.reply("일정 유저 저장 중 오류가 발생했습니다..").setEphemeral(true).queue();
             return;
         }
+
         //문구 작성 시작
         StringBuilder sb = new StringBuilder();
         sb.append("📅 일정 등록 완료\n")

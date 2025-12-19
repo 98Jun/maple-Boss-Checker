@@ -357,46 +357,6 @@ public class SlashComandEvent extends ListenerAdapter {
                     //캐릭터 고유 키값 체크
                     nexonApiClient.getJson("/maplestory/v1/id", Map.of("character_name", inputName))
                             .map(json -> json.path("ocid").asText(""))
-//                            .flatMap(ocid -> {
-//
-//                                //키값 유효성 검증
-//                                if (ocid.isBlank()) {
-//                                    return reactor.core.publisher.Mono.error(new IllegalStateException("ocid가 비어있음"));
-//                                }
-//                                // ocid로 다음 API 호출
-//                                return nexonApiClient.getJson("/maplestory/v1/character/basic", Map.of("ocid", ocid));
-//                            })
-//                            .subscribe(
-//                                    basicJson -> {
-//                                        //조회한 캐릭터 정보
-//                                        String characterName = basicJson.path("character_name").asText("");
-//                                        int level = basicJson.path("character_level").asInt(0);
-//                                        String characterClass = basicJson.path("character_class").asText("");
-//                                        String characterExpRate = basicJson.path("character_exp_rate").asText("");
-//                                        String characterGuildName = basicJson.path("character_guild_name").asText("");
-//
-//                                        //캐릭터 이미지
-//                                        var eb = new EmbedBuilder()
-//                                                .setTitle("캐릭터 이미지")
-//                                                .setImage(basicJson.path("character_image").asText("")); // 공개로 접근 가능한 이미지 URL
-//
-//                                        String resultMsg = """
-//                                            조회일자 : %s
-//
-//                                            캐릭터 명 : %s
-//                                            레벨 : %s
-//                                            직업 : %s
-//                                            경험치 : %s
-//                                            길드 : %s
-//
-//                                            """.formatted(nowDateFormat,characterName,level,characterClass, characterExpRate, characterGuildName);
-//
-//                                        hook.editOriginal(resultMsg)
-//                                                .setEmbeds(eb.build())
-//                                                .queue();
-//                                    },
-//                                    err -> hook.editOriginal("API 호출 실패: " + err.getMessage()).queue()
-//                            );
                             .flatMap(ocid -> reactor.core.publisher.Mono.zip(
                                     nexonApiClient.getJson("/maplestory/v1/character/basic", Map.of("ocid", ocid)),
                                     nexonApiClient.getJson("/maplestory/v1/character/stat", Map.of("ocid", ocid)),

@@ -1,6 +1,7 @@
 package com.let.scheduler;
 
 import com.let.domain.MaplePartySearchVO;
+import com.let.domain.MemberVO;
 import com.let.service.MaplePartyScheduleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,18 +44,20 @@ public class MaplePartyScheduler {
     public void checkParty() throws ParseException {
         //일정이 있는지 조회
         List<MaplePartySearchVO> memberVOList = this.maplePartyScheduleService.searchPartySchedule();
-        //
+
         for(MaplePartySearchVO schedule : memberVOList){
 
             // 두시간 전  체크
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
             boolean afterDateCheck = schedule.getDate().equals(formatter.parse(String.valueOf(LocalDate.now())));
             if(!afterDateCheck) continue;
+
             boolean afterTimeCheck  = maplePartyScheduleService.isWithinNextTwoHours(schedule.getTime(), Clock.systemDefaultZone());
             if(!afterTimeCheck) continue;
 
             //호출 할 멤버가 없으면 실행하지 않는다
-            List<String> partyUser = schedule.getMemberDiscordId();
+            List<MemberVO> partyUser = schedule.getMember();
+
             if(partyUser == null || partyUser.isEmpty() ){
                 this.maplePartyScheduleService.updatePartyUseAt(schedule);
                 continue;

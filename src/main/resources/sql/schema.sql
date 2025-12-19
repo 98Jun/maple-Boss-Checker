@@ -17,6 +17,7 @@ CREATE TABLE maple_boss_party (
 CREATE TABLE maple_party_member (
   party_id BIGINT NOT NULL,
   discord_user_id VARCHAR(30) NOT NULL,
+  discord_user_name VARCHAR(30) NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (party_id, discord_user_id),
   FOREIGN KEY (party_id) REFERENCES maple_boss_party(id)

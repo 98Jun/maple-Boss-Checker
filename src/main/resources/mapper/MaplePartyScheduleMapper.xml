@@ -26,10 +26,10 @@
     </insert>
 
     <insert id="insertPartyMemberList" parameterType="com.let.domain.MaplePartyMemberVO">
-        INSERT INTO maple_party_member (party_id, discord_user_id)
+        INSERT INTO maple_party_member (party_id, discord_user_id,discord_user_name)
         VALUES
         <foreach collection="members" item="member" separator=",">
-            (#{partyId}, #{member})
+            (#{partyId}, #{member.memberDiscordId} ,#{member.memberName})
         </foreach>
     </insert>
 
@@ -55,8 +55,9 @@
         <result property="time" column="time" jdbcType="TIME"/>
         <result property="date" column="date" jdbcType="DATE"/>
         <!-- 멤버는 row마다 1개씩 오므로 List로 누적 -->
-        <collection property="memberDiscordId" ofType="java.lang.String">
-            <result column="memberDiscordId"/>
+        <collection property="member" javaType="java.util.ArrayList" ofType="com.let.domain.MemberVO">
+            <result property="memberDiscordId" column="memberDiscordId"/>
+            <result property="memberName" column="memberName"/>
         </collection>
     </resultMap>
     <select id="searchPartySchedule" resultMap="searchScheduleMap">
@@ -66,7 +67,8 @@
             b.channel_id as "channelId",
             b.party_time as "time",
             b.party_date as "date",
-            m.discord_user_id as "memberDiscordId"
+            m.discord_user_id as "memberDiscordId",
+            m.discord_user_name as "memberName"
         FROM
             maple_boss_party b
             inner join maple_party_member m on b.id = m.party_id

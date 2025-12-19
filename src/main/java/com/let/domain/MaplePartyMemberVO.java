@@ -27,9 +27,9 @@ public class MaplePartyMemberVO {
     @Schema(example = "1",description = "일정 키값 아이디 (maple_boss_party 의 id)")
     private int partyId;
     @Schema(example = "123123 ...",description = "일정에 태그된 회원들")
-    private List<String> members;
+    private List<MemberVO> members;
 
-    public MaplePartyMemberVO(int partyId, List<String> members) {
+    public MaplePartyMemberVO(int partyId, List<MemberVO> members) {
         this.partyId = partyId;
         this.members = members;
     }

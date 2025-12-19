@@ -1,0 +1,19 @@
+# 빌드 산출물/캐시
+.gradle
+build
+out
+
+# IDE
+.idea
+*.iml
+
+# OS
+.DS_Store
+
+# 로그
+*.log
+
+# 절대 포함되면 안 되는 민감정보(있다면)
+.env
+*.pem
+*.key

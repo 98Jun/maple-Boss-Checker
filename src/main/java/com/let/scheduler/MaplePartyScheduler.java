@@ -40,8 +40,8 @@ public class MaplePartyScheduler {
     private final MaplePartyScheduleService maplePartyScheduleService;
 
 
-//    @Scheduled(cron = "0 0 * * * *", zone = "Asia/Seoul") //
-    @Scheduled(cron = "0 */14 * * * *", zone = "Asia/Seoul") //15분이 지나면 gender(무료 운영기 환경)이 멈춤을 방지하기 위해 14분마다 스케줄러 실행
+    @Scheduled(cron = "0 0 * * * *", zone = "Asia/Seoul") //
+//    @Scheduled(cron = "0 */14 * * * *", zone = "Asia/Seoul") //15분이 지나면 gender(무료 운영기 환경)이 멈춤을 방지하기 위해 14분마다 스케줄러 실행
     public void checkParty() throws ParseException {
         //일정이 있는지 조회
         List<MaplePartySearchVO> memberVOList = this.maplePartyScheduleService.searchPartySchedule();

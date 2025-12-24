@@ -108,6 +108,10 @@ public class CharacterItemMessageServiceImpl implements CharacterItemMessageServ
 
         StringBuilder sb = new StringBuilder();
         sb.append("\n⚔ 캐릭터 스펙\n");
+        if (statVO == null || statVO.finalStat() == null || statVO.finalStat().isEmpty()) {
+            return sb.append("- (스탯 정보 없음)").toString().trim();
+        }
+
         for(MapleCharacterStatVO.StatEntry stat : statVO.finalStat()){
             String statName = stat.name();
             for(String stats: statsList){

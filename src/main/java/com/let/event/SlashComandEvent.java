@@ -140,8 +140,8 @@ public class SlashComandEvent extends ListenerAdapter {
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event){
         // 문자열 채널 ID
         String channelId = event.getChannel().getId();
-        //고담 , 봇테 채널
-        if(!channelId.equals("1450034042517852182") && !channelId.equals("1448173918283108469")) return;
+        //고담 , 봇테 채널, 비상구 채널
+        if(!channelId.equals("1450034042517852182") && !channelId.equals("1448173918283108469") && !channelId.equals("1453264900834197535")) return;
 
         String eventName = event.getName();
 

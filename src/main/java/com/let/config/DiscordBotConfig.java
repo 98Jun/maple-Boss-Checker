@@ -1,7 +1,7 @@
 package com.let.config;
 
 import com.let.event.MapleNameResponseEvent;
-import com.let.event.ScheduleSelectListenerEvnet;
+import com.let.event.ScheduleSelectListenerEvent;
 import com.let.event.SlashComandEvent;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.JDA;
@@ -34,7 +34,7 @@ public class DiscordBotConfig {
     // ✅ 스프링이 관리하는 이벤트 리스너 빈을 주입받는다
     private final MapleNameResponseEvent mapleNameResponseEvent;
     private final SlashComandEvent slashComandEvent;
-    private final ScheduleSelectListenerEvnet scheduleSelectListenerEvnet;
+    private final ScheduleSelectListenerEvent scheduleSelectListenerEvent;
 
     @Bean //
     public JDA jda() {
@@ -53,7 +53,7 @@ public class DiscordBotConfig {
                 .addEventListeners(
                         mapleNameResponseEvent,
                         slashComandEvent,
-                        scheduleSelectListenerEvnet)
+                        scheduleSelectListenerEvent)
                     .build();
         return jda;
     }

@@ -33,8 +33,8 @@ public class MapleNameResponseEvent extends ListenerAdapter {
         if (event.getAuthor().isBot() || event.isWebhookMessage()) return;
 
         String id =event.getChannel().getId();
-        //고담 , 봇테 채널
-        if(!id.equals("1450034042517852182") && !id.equals("1448173918283108469")) return;
+        //고담 , 봇테 채널, 비상구
+        if(!id.equals("1450034042517852182") && !id.equals("1448173918283108469") && !id.equals("1453264900834197535")) return;
 
         //
         String message = event.getMessage().getContentDisplay();

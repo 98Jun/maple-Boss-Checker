@@ -26,7 +26,7 @@ import java.util.List;
  */
 @Component
 @RequiredArgsConstructor
-public class ScheduleSelectListenerEvnet extends ListenerAdapter {
+public class ScheduleSelectListenerEvent extends ListenerAdapter {
 
     @Autowired
     private MaplePartyScheduleService maplePartyScheduleService;

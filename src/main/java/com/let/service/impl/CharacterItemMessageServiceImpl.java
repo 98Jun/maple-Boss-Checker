@@ -111,7 +111,12 @@ public class CharacterItemMessageServiceImpl implements CharacterItemMessageServ
         for(MapleCharacterStatVO.StatEntry stat : statVO.finalStat()){
             String statName = stat.name();
             for(String stats: statsList){
-                if(stats.equals(statName)) sb.append(stat.name()).append(" :").append(stat.value()).append("\n");
+
+                if(!stats.equals(statName)){
+                    sb.append(stat.name()).append(" :").append(stat.value()).append("\n");
+                    break;
+                }
+
             }
         }
 

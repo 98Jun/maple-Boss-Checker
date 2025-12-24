@@ -1,12 +1,12 @@
 package com.let.event;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.let.client.NexonApiClient;
+import com.let.domain.MapleCharacterStatVO;
 import com.let.domain.MaplePartyScheduleVO;
-import com.let.service.MapleDistributionService;
-import com.let.service.MapleDutyCheckService;
-import com.let.service.MaplePartyScheduleService;
-import com.let.service.MapleUtilService;
+import com.let.service.*;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
@@ -20,15 +20,10 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.math.BigDecimal;
 import java.sql.Time;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -60,6 +55,11 @@ public class SlashComandEvent extends ListenerAdapter {
     private MaplePartyScheduleService maplePartyScheduleService;
     @Autowired
     private NexonApiClient nexonApiClient;
+    @Autowired
+    private  ObjectMapper objectMapper;
+
+    @Autowired
+    private CharacterItemMessageService characterItemMessageService;
 
 
     @Override
@@ -372,19 +372,27 @@ public class SlashComandEvent extends ListenerAdapter {
                                 String characterClass = basic.path("character_class").asText("");
                                 String characterExpRate = basic.path("character_exp_rate").asText("");
                                 String characterGuildName = basic.path("character_guild_name").asText("");
+                                String characterDateCreate = basic.path("character_date_create").asText("").substring(0,10);
                                 //캐릭터 이미지
                                 var eb = new EmbedBuilder()
                                         .setTitle("캐릭터 이미지")
                                         .setImage(basic.path("character_image").asText("")); // 공개로 접근 가능한 이미지 URL
+
+                                //캐릭터 스텟
                                 JsonNode stat  = tuple.getT2();
-                                JsonNode equip = tuple.getT3();
+                                String statMsg = "";
+                                try {
+                                    MapleCharacterStatVO statVO = objectMapper.treeToValue(stat, MapleCharacterStatVO.class);
+                                    statMsg = characterItemMessageService.buildStatsEquipmentMessage(statVO);
+                                } catch (JsonProcessingException e) {
+                                    throw new RuntimeException(e);
+                                }
 
-
-                                System.out.println(stat);
-                                System.out.println("---");
-                                System.out.println(equip);
-
-                                        String resultMsg = """
+                                //캐릭터 아이템 정보
+                                JsonNode item = tuple.getT3();
+                                String itemMsg = characterItemMessageService.buildItemEquipmentMessage(item);
+//96d6e1f5076412df32e0cf240fe52404
+                                String resultMsg = """
                                             조회일자 : %s
 
                                             캐릭터 명 : %s
@@ -392,12 +400,16 @@ public class SlashComandEvent extends ListenerAdapter {
                                             직업 : %s
                                             경험치 : %s
                                             길드 : %s
+                                            생성일자 : %s
+                                            
+                                            %s
+                                            
+                                            %s
+                                            """.formatted(nowDateFormat, characterName, level, characterClass, characterExpRate, characterGuildName,characterDateCreate,statMsg, itemMsg);
 
-                                            """.formatted(nowDateFormat,characterName,level,characterClass, characterExpRate, characterGuildName);
-
-                                        hook.editOriginal(resultMsg)
-                                                .setEmbeds(eb.build())
-                                                .queue();
+                                hook.editOriginal(resultMsg)
+                                        .setEmbeds(eb.build())
+                                        .queue();
                             }, err -> hook.editOriginal("실패: " + err.getMessage()).queue());
                 });
 
@@ -407,3 +419,5 @@ public class SlashComandEvent extends ListenerAdapter {
     }
 
 }
+
+

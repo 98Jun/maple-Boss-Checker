@@ -1,6 +1,10 @@
 package com.let.controller;
 
+import com.let.dto.ChannelDTO;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -17,4 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController("/test")
 public class MapleBossCheckerController {
 
+    @PostMapping
+    public ResponseEntity<?> insertChannelId(@ParameterObject ChannelDTO dto){
+
+        return ResponseEntity.ok(null);
+    }
 }

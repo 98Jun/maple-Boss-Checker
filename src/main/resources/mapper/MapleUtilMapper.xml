@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.let.service.impl.mapper.MapleUtilMapper">
+    <select id="getChannelList" resultType="com.let.domain.ChannelVO">
+        SELECT
+            id,
+            channel_id as channelId,
+            memo as channelMemo,
+            use_at as useAt
+        FROM
+            channel_id
+        where
+            use_at = 'Y'
+
+    </select>
+</mapper>

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.let.client.NexonApiClient;
+import com.let.domain.ChannelVO;
 import com.let.domain.MapleCharacterStatVO;
 import com.let.domain.MaplePartyScheduleVO;
 import com.let.service.*;
@@ -140,8 +141,11 @@ public class SlashComandEvent extends ListenerAdapter {
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event){
         // 문자열 채널 ID
         String channelId = event.getChannel().getId();
-        //고담 , 봇테 채널, 비상구 채널
-        if(!channelId.equals("1450034042517852182") && !channelId.equals("1448173918283108469") && !channelId.equals("1453264900834197535")) return;
+        //고담 , 봇테 채널, 비상구와 같이 저장된 채널들만 허용함
+        List<ChannelVO> channelList = mapleUtilService.getChannelList();
+        for(ChannelVO channel : channelList) {
+            if(!channelId.equals(channel.getChannelId())) return;
+        }
 
         String eventName = event.getName();
 

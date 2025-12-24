@@ -1,8 +1,10 @@
 package com.let.event;
 
+import com.let.domain.ChannelVO;
 import com.let.domain.MaplePartySearchVO;
 import com.let.domain.MemberVO;
 import com.let.service.MaplePartyScheduleService;
+import com.let.service.MapleUtilService;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -28,14 +30,25 @@ public class MapleNameResponseEvent extends ListenerAdapter {
 
     @Autowired
     private MaplePartyScheduleService maplePartyScheduleService;
+    @Autowired
+    private MapleUtilService mapleUtilService;
+
     public void onMessageReceived(MessageReceivedEvent event) {
         //응답을 한번만 하기 위함
         if (event.getAuthor().isBot() || event.isWebhookMessage()) return;
 
         String id =event.getChannel().getId();
-        //고담 , 봇테 채널, 비상구
-        if(!id.equals("1450034042517852182") && !id.equals("1448173918283108469") && !id.equals("1453264900834197535")) return;
-
+        //고담 , 봇테 채널, 비상구와 같이 저장된 채널들만 허용함
+        List<ChannelVO> channelList = mapleUtilService.getChannelList();
+        boolean channelCheck = false;
+        for(ChannelVO channel : channelList) {
+            if(id.equals(channel.getChannelId())){
+                channelCheck = true;
+                break;
+            }
+        }
+        //
+        if(!channelCheck) return;
         //
         String message = event.getMessage().getContentDisplay();
         switch (message){

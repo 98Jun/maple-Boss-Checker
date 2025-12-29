@@ -26,4 +26,7 @@ public interface MapleUtilService {
     public boolean checkDateTime(String date, String time);
 
     List<ChannelVO> getChannelList();
+    ChannelVO searchChannelById(ChannelVO channelVO);
+
+    ChannelVO insertChannel(ChannelVO channelVO);
 }

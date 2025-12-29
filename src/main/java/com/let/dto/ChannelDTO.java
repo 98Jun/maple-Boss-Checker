@@ -1,5 +1,6 @@
 package com.let.dto;
 
+import com.let.domain.ChannelVO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,4 +25,11 @@ public class ChannelDTO {
     private String  channelId;
     private String  channelMemo;
 
+    public ChannelVO convertDTOtoVO(ChannelDTO channelDTO) {
+
+        return ChannelVO.builder()
+                .channelId(channelDTO.getChannelId())
+                .channelMemo(channelDTO.getChannelMemo())
+                .build();
+    }
 }

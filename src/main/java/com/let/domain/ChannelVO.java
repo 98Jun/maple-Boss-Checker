@@ -1,10 +1,7 @@
 package com.let.domain;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 /**
  * packageName    : com.let.domain
@@ -21,6 +18,8 @@ import lombok.ToString;
 @Setter
 @ToString
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ChannelVO {
     @Schema(description = "키값",example = "1")
     private int id;

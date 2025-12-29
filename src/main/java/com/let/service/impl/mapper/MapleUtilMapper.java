@@ -19,4 +19,8 @@ import java.util.List;
 @Mapper
 public interface MapleUtilMapper {
     List<ChannelVO> getChannelList();
+
+    ChannelVO searchChannelById(ChannelVO channelVO);
+
+    ChannelVO insertChannel(ChannelVO channelVO);
 }

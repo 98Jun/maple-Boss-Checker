@@ -13,4 +13,29 @@
             use_at = 'Y'
 
     </select>
+    <select id="searchChannelById" parameterType="com.let.domain.ChannelVO" resultType="com.let.domain.ChannelVO">
+        SELECT
+            id,
+            channel_id as channelId,
+            memo as channelMemo,
+            use_at as useAt
+        FROM
+            channel_id
+        where
+            use_at = 'Y' ans
+            channel_id = #{channelId}
+    </select>
+    <insert id="insertChannel" parameterType="com.let.domain.ChannelVO" useGeneratedKeys="true">
+        INSERT INTO
+            channel_id(
+                channel_id,
+                memo,
+                use_at
+            )
+        VALUES(
+            #{channelId}
+            #{channelMemo}
+            'Y'
+        )
+    </insert>
 </mapper>

@@ -59,4 +59,14 @@ public class MapleUtilServiceImpl implements MapleUtilService {
     public List<ChannelVO> getChannelList() {
         return this.mapleUtilMapper.getChannelList();
     }
+
+    @Override
+    public ChannelVO searchChannelById(ChannelVO channelVO) {
+        return this.mapleUtilMapper.searchChannelById(channelVO);
+    }
+
+    @Override
+    public ChannelVO insertChannel(ChannelVO channelVO) {
+        return this.mapleUtilMapper.insertChannel(channelVO);
+    }
 }

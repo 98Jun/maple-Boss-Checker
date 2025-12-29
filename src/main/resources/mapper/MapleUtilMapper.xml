@@ -22,10 +22,12 @@
         FROM
             channel_id
         where
-            use_at = 'Y' ans
+            use_at = 'Y' and
             channel_id = #{channelId}
     </select>
-    <insert id="insertChannel" parameterType="com.let.domain.ChannelVO" useGeneratedKeys="true">
+
+    <select id="insertChannel" parameterType="com.let.domain.ChannelVO"
+            resultType="com.let.domain.ChannelVO" >
         INSERT INTO
             channel_id(
                 channel_id,
@@ -33,9 +35,11 @@
                 use_at
             )
         VALUES(
-            #{channelId}
-            #{channelMemo}
+            #{channelId},
+            #{channelMemo},
             'Y'
         )
-    </insert>
+        RETURNING id , channel_id as channelId, memo as channelMemo, use_at as useAt
+    </select>
+
 </mapper>

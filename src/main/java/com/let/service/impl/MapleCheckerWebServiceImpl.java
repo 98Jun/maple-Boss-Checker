@@ -26,16 +26,16 @@ public class MapleCheckerWebServiceImpl implements MapleCheckerWebService {
     private MapleUtilService mapleUtilService;
 
     @Override
-    public JSONObject insertChannelId(ChannelDTO dto) {
-        JSONObject result = new JSONObject();
+    public ChannelDTO.channelResponse insertChannelId(ChannelDTO.channelRequest dto) {
+        ChannelDTO.channelResponse result = new ChannelDTO.channelResponse();
         ChannelVO channelVO = dto.convertDTOtoVO(dto);
 
         // 이미 저장되어 있는 채널 아이디인지 유효성 검증
         ChannelVO searchChannel = this.mapleUtilService.searchChannelById(channelVO);
 
         if(searchChannel != null) {
-            result.put("msg","이미 저장된 채널입니다.");
-            result.put("status",500);
+            result.setMsg("이미 저장된 채널입니다.");
+            result.setStatus(500);
             return result;
         }
 
@@ -43,14 +43,14 @@ public class MapleCheckerWebServiceImpl implements MapleCheckerWebService {
         ChannelVO insertChannel = this.mapleUtilService.insertChannel(channelVO);
 
         if(insertChannel == null || insertChannel.getChannelId().isEmpty()) {
-            result.put("msg"," 채널 등록 중 오류가 발생했습니다. 관리자에게 문의 해 주세요.");
-            result.put("status",500);
+            result.setMsg("채널 등록 중 오류가 발생했습니다. 관리자에게 문의 해 주세요.");
+            result.setStatus(500);
             return result;
         }
 
-        result.put("msg", "OK");
-        result.put("status",200);
-        result.put("channelKey",insertChannel.getChannelId());
+        result.setMsg("OK");
+        result.setStatus(200);
+        result.setChannel(insertChannel);
 
         return result;
     }

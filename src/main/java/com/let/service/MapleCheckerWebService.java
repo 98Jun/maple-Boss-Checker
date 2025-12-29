@@ -15,5 +15,5 @@ import org.json.JSONObject;
  * 25. 12. 24.        jun       최초 생성
  */
 public interface MapleCheckerWebService {
-    JSONObject insertChannelId(ChannelDTO dto);
+    ChannelDTO.channelResponse insertChannelId(ChannelDTO.channelRequest dto);
 }

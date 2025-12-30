@@ -69,4 +69,9 @@ public class MapleUtilServiceImpl implements MapleUtilService {
     public ChannelVO insertChannel(ChannelVO channelVO) {
         return this.mapleUtilMapper.insertChannel(channelVO);
     }
+
+    @Override
+    public Integer deleteChannel(int id) {
+        return this.mapleUtilMapper.deleteChannel(id);
+    }
 }

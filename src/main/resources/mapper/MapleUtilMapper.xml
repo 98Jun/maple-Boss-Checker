@@ -41,5 +41,12 @@
         )
         RETURNING id , channel_id as channelId, memo as channelMemo, use_at as useAt
     </select>
-
+    <update id="deleteChannel" parameterType="int" >
+        UPDATE
+            channel_id
+        set
+            use_at = 'N'
+        where
+            channel_id = #{channelId}
+    </update>
 </mapper>

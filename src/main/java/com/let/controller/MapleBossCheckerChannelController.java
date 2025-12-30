@@ -3,6 +3,7 @@ package com.let.controller;
 import com.let.dto.ChannelDTO;
 import com.let.service.MapleCheckerWebService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.json.JSONObject;
 import org.springdoc.core.annotations.ParameterObject;
@@ -34,6 +35,21 @@ public class MapleBossCheckerChannelController {
     @Operation(description = "채널 등록")
     public ResponseEntity<ChannelDTO.channelResponse> insertChannelId(@ParameterObject ChannelDTO.channelRequest dto){
         var result = mapleCheckerWebService.insertChannelId(dto);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/search")
+    @Operation(description = "채널id 로 내부 키값 조회")
+    public ResponseEntity<?> searchChannelId(@Parameter String channelNumber){
+        var result = mapleCheckerWebService.searchChannelId(channelNumber);
+
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/delete")
+    @Operation(description = "채널 리스트 제외")
+    public ResponseEntity<?> deleteChannel(@Parameter int id){
+        var result = mapleCheckerWebService.deleteChannel(id);
         return ResponseEntity.ok(result);
     }
 }

@@ -29,4 +29,6 @@ public interface MapleUtilService {
     ChannelVO searchChannelById(ChannelVO channelVO);
 
     ChannelVO insertChannel(ChannelVO channelVO);
+
+    Integer deleteChannel(int id);
 }

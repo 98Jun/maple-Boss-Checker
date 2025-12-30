@@ -1,5 +1,6 @@
 package com.let.service;
 
+import com.let.common.CommonResponseDTO;
 import com.let.dto.ChannelDTO;
 import org.json.JSONObject;
 
@@ -16,4 +17,8 @@ import org.json.JSONObject;
  */
 public interface MapleCheckerWebService {
     ChannelDTO.channelResponse insertChannelId(ChannelDTO.channelRequest dto);
+
+    ChannelDTO.channelResponse searchChannelId(String channelNumber);
+
+    CommonResponseDTO deleteChannel(int id);
 }

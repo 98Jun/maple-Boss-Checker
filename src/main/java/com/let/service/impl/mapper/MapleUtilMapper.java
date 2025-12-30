@@ -23,4 +23,6 @@ public interface MapleUtilMapper {
     ChannelVO searchChannelById(ChannelVO channelVO);
 
     ChannelVO insertChannel(ChannelVO channelVO);
+
+    int deleteChannel(int id);
 }

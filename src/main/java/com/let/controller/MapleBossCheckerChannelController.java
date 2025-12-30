@@ -9,9 +9,7 @@ import org.json.JSONObject;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * packageName    : com.let.controller
@@ -24,7 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
  * -----------------------------------------------------------
  * 25. 12. 10.        jun       최초 생성
  */
-@RestController("/channel")
+@RestController
+@RequestMapping("/channel")
 @Tag(name = "봇 채널관련 컨트롤러")
 public class MapleBossCheckerChannelController {
 
@@ -33,7 +32,7 @@ public class MapleBossCheckerChannelController {
 
     @PostMapping("/register")
     @Operation(description = "채널 등록")
-    public ResponseEntity<ChannelDTO.channelResponse> insertChannelId(@ParameterObject ChannelDTO.channelRequest dto){
+    public ResponseEntity<ChannelDTO.channelResponse> insertChannelId(@RequestBody ChannelDTO.channelRequest dto){
         var result = mapleCheckerWebService.insertChannelId(dto);
         return ResponseEntity.ok(result);
     }

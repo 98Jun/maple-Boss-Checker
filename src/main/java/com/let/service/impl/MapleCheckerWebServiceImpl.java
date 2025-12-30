@@ -9,6 +9,8 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * packageName    : com.let.service.impl
  * fileName       : MapleCheckerWebServiceImpl
@@ -111,6 +113,28 @@ public class MapleCheckerWebServiceImpl implements MapleCheckerWebService {
             result.setMsg("채널 리스트에서 제외에 실패했습니다. 관리자에게 문의 해 주세요. error : "+e.getMessage());
         }
 
+        return result;
+    }
+
+    @Override
+    public ChannelDTO.channelListResponse getChannelList() {
+        ChannelDTO.channelListResponse result = new ChannelDTO.channelListResponse();
+        try{
+            List<ChannelVO> ChannelList = this.mapleUtilService.getChannelList();
+
+            if(ChannelList == null || ChannelList.isEmpty()) {
+                result.setStatus(500);
+                result.setMsg("채널 리스트가 비어있습니다. ");
+                return result;
+            }
+            result.setMsg("OK");
+            result.setStatus(200);
+            result.setChannels(ChannelList);
+
+        }catch (Exception e){
+            result.setStatus(500);
+            result.setMsg("채널 리스트 조회가 실패 했습니다. error : " +e.getMessage());
+        }
         return result;
     }
 }

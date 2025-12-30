@@ -46,6 +46,13 @@ public class MapleBossCheckerChannelController {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("/list")
+    @Operation(description = "저장된 채널 리스트 조회")
+    public ResponseEntity<?> getChannelList(){
+        var result = mapleCheckerWebService.getChannelList();
+        return ResponseEntity.ok(result);
+    }
+
     @PostMapping("/delete")
     @Operation(description = "채널 리스트 제외")
     public ResponseEntity<?> deleteChannel(@Parameter int id){

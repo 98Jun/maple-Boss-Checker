@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.List;
+
 /**
  * packageName    : com.let.dto
  * fileName       : ChannelDTO
@@ -47,5 +49,11 @@ public class ChannelDTO {
     @ToString
     public static class channelResponse extends CommonResponseDTO {
         private ChannelVO channel;
+    }
+    @Getter
+    @Setter
+    @ToString
+    public static class channelListResponse extends CommonResponseDTO {
+        private List<ChannelVO> channels;
     }
 }

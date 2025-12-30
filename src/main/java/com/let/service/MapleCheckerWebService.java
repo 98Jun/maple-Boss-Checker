@@ -21,4 +21,6 @@ public interface MapleCheckerWebService {
     ChannelDTO.channelResponse searchChannelId(String channelNumber);
 
     CommonResponseDTO deleteChannel(int id);
+
+    ChannelDTO.channelListResponse getChannelList();
 }

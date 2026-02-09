@@ -395,7 +395,6 @@ public class SlashComandEvent extends ListenerAdapter {
                                 //캐릭터 아이템 정보
                                 JsonNode item = tuple.getT3();
                                 String itemMsg = characterItemMessageService.buildItemEquipmentMessage(item);
-//96d6e1f5076412df32e0cf240fe52404
                                 String resultMsg = """
                                             조회일자 : %s
 
